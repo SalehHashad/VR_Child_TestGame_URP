@@ -61,7 +61,7 @@ public class VisualAttentionTaskBall : MonoBehaviour
         if (ballMaterial != null)
         {
             ballMaterial.color = Color.red;
-            isRed = true;
+            // isRed = true;
             Invoke("RevertColor", 2f); // Revert after 2 seconds
         }
     }
@@ -84,8 +84,8 @@ public class VisualAttentionTaskBall : MonoBehaviour
     {
         if (taskManager != null)
         {
-            RevertColor();
-            if (isRed)
+            // Check if the ball has the "Red" tag
+            if (CompareTag("Red"))
             {
                 taskManager.OnBallClicked(true); // Send true if it's a red ball
             }

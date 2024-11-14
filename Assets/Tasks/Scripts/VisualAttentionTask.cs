@@ -6,10 +6,12 @@ using System.Collections.Generic;
 public class VisualAttentionTask : MonoBehaviour
 {
     public GameObject spherePrefab; // Assign sphere prefab in the inspector
+     public GameObject redBallPrefab; // Assign red ball prefab in the inspector
     public Transform spawnPoint; // Point where spheres will spawn
-    public int startingObjects = 5; // Initial number of objects
+    public int startingObjects = 4; // Initial number of objects
     public float speed = 3f; // Speed of object movement
     public int level = 1; // Current level
+    public int QuestionPerLevel = 20; // Current level
     public float roundTime = 10f; // Timer duration for each round
 
     public TMP_Text levelText; // TextMeshPro for Level
@@ -22,22 +24,32 @@ public class VisualAttentionTask : MonoBehaviour
     private float currentTime;
     private bool roundActive = true;
     private int score = 0;
+    private int Question = 1;
 
     private int correctTrackingStreak = 0; // To track consecutive correct answers
     private int correctRedObjectsCount = 0; // Count of correctly tracked red objects
     private int totalRedObjects = 0; // Total red objects for the round
 
+    private GameObject boundary;
+
     private void Start()
     {
-        currentTime = roundTime;
+        
+        boundary = GameObject.Find("Boundary");
         UpdateUI();
         StartLevel(level);
+        
     }
 
     void StartLevel(int level)
     {
+        roundActive=true;
+       SetLevelParameters(level);
+       currentTime = roundTime;
+    boundary.SetActive(true);
+        
         ClearObjects();
-        SetLevelParameters(level);
+        
         SpawnObjects();
         UpdateUI();
     }
@@ -54,30 +66,43 @@ public class VisualAttentionTask : MonoBehaviour
                 EndRound();
             }
         }
+        Debug.Log("correctRedObjectsCount:"+correctRedObjectsCount);
+        Debug.Log("totalRedObjects:"+totalRedObjects);
     }
 
     void SetLevelParameters(int level)
     {
-        startingObjects = 5 + level; // Increase objects each level
-        speed = 3f + level * 0.5f; // Increase speed slightly each level
+        startingObjects = 4 + level; // Increase objects each level
+        speed = 3f + level * 0.5f* Question; // Increase speed slightly each level
+        currentTime=roundTime-level+1;
     }
 
-    void SpawnObjects()
+    
+     void SpawnObjects()
     {
         correctRedObjectsCount = 0; // Reset count for new round
         totalRedObjects = level; // Number of red objects based on level
 
         for (int i = 0; i < startingObjects; i++)
         {
-            GameObject sphere = Instantiate(spherePrefab, spawnPoint.position, Quaternion.identity);
+            GameObject sphere;
+            if (i < totalRedObjects)
+            {
+                sphere = Instantiate(redBallPrefab, spawnPoint.position, Quaternion.identity); // Spawn red ball prefab
+            }
+            else
+            {
+                sphere = Instantiate(spherePrefab, spawnPoint.position, Quaternion.identity); // Spawn regular sphere prefab
+            }
+            
             sphere.GetComponent<Rigidbody>().useGravity = false;
             objects.Add(sphere);
 
             // Attach the VisualAttentionTaskBall script
-            VisualAttentionTaskBall ballScript = sphere.AddComponent<VisualAttentionTaskBall>();
-            if (i < totalRedObjects) // Increase red objects based on level
+            // VisualAttentionTaskBall ballScript = sphere.AddComponent<VisualAttentionTaskBall>();
+            if (i < totalRedObjects) // Mark red objects
             {
-                ballScript.HighlightRed(); // Highlight red objects
+                HighlightRed(sphere); // Highlight red objects
             }
 
             // Add RandomMovement component and set its speed
@@ -85,6 +110,28 @@ public class VisualAttentionTask : MonoBehaviour
             movement.SetSpeed(speed);
         }
     }
+    // Modified HighlightRed to use a coroutine
+private void HighlightRed(GameObject ball)
+{
+    Renderer renderer = ball.GetComponent<Renderer>();
+    if (renderer != null)
+    {
+        renderer.material.color = Color.red;
+        StartCoroutine(RevertColorCoroutine(ball, 2f)); // Revert after 2 seconds
+    }
+}
+
+// Coroutine to revert color after a delay
+private IEnumerator RevertColorCoroutine(GameObject ball, float delay)
+{
+    yield return new WaitForSeconds(delay);
+
+    Renderer renderer = ball.GetComponent<Renderer>();
+    if (renderer != null)
+    {
+        renderer.material.color = Color.white; // Change back to default color
+    }
+}
 
     void EndRound()
     {
@@ -105,7 +152,7 @@ public class VisualAttentionTask : MonoBehaviour
 
         // Update instructions and deactivate boundary
         instructionsText.text = "Time's up! Click on the spheres to identify them.";
-        GameObject boundary = GameObject.Find("Boundary");
+        // GameObject boundary = GameObject.Find("Boundary");
         if (boundary != null)
         {
             boundary.SetActive(false);
@@ -120,12 +167,23 @@ public class VisualAttentionTask : MonoBehaviour
         }
         objects.Clear();
     }
-
+    void LevelUp()
+    {
+        level++;
+        Question = 0;
+        StartLevel(level);
+        instructionsText.text = "Congratulations! Level Up!";
+    }
     void UpdateUI()
     {
+        
         levelText.text = "Level: " + level;
         scoreText.text = "Score: " + score;
-        questionText.text = "Question: 1"; // Placeholder, update as needed
+        questionText.text = "Question: "+ Question+"/"+QuestionPerLevel; // Placeholder, update as needed
+        if(Question==QuestionPerLevel)
+        {
+            LevelUp();
+        }
         instructionsText.text = "Track the red objects and remember their positions!";
     }
 
@@ -145,14 +203,8 @@ public class VisualAttentionTask : MonoBehaviour
             score -= 1; // Deduct 1 point for an incorrect identification
             instructionsText.text = "Oops! That wasn't a red ball.";
         }
-
-        // If all red objects were correctly identified, check for consecutive tracking
-        if (correctRedObjectsCount == totalRedObjects)
-        {
-            correctTrackingStreak++;
-            score += correctTrackingStreak; // Bonus points for consecutive correct answers
-            instructionsText.text = "Well done! All red objects tracked correctly. Streak: " + correctTrackingStreak;
-        }
+ CheckRoundTracking();
+    
 
         // Update the score UI
         UpdateUI();
@@ -164,11 +216,14 @@ public class VisualAttentionTask : MonoBehaviour
         if (correctRedObjectsCount == totalRedObjects)
         {
             correctTrackingStreak++;
-            score += correctTrackingStreak; // Bonus for consecutive correct tracking
+            Question+=1;
+            // score += correctTrackingStreak; // Bonus for consecutive correct trackings
             instructionsText.text = "Correct tracking! Streak: " + correctTrackingStreak;
+            StartLevel(level);
         }
         else
         {
+            correctTrackingStreak=0;
             instructionsText.text = "You missed some red objects.";
         }
     }
