@@ -28,12 +28,18 @@ public class ObjectController : MonoBehaviour
         StartQuestion();
     }
 
-    void StartQuestion()
+  void StartQuestion()
 {
     // Reset the rotation of all objects to the default orientation
     foreach (GameObject obj in objects)
     {
         obj.transform.rotation = Quaternion.identity; // Resets rotation to (0,0,0)
+    }
+
+    // Reset transparency of all objects to 1 (fully opaque)
+    foreach (GameObject obj in objects)
+    {
+        SetChildImageTransparency(obj, 1f);
     }
 
     // Display the question and score
@@ -47,6 +53,11 @@ public class ObjectController : MonoBehaviour
     int rotatingIndex = Random.Range(0, objects.Length);
     rotatingObject = objects[rotatingIndex];
     Debug.Log("Selected rotating object index: " + rotatingIndex + ", Object name: " + rotatingObject.name);
+
+    // Randomize the initial rotation of the rotating object (0 or 90 degrees)
+    float randomRotationAngle = Random.value < 0.5f ? 0f : 90f;
+    rotatingObject.transform.Rotate(rotationAxis * randomRotationAngle, Space.Self);
+    Debug.Log("Rotating object random rotation angle: " + randomRotationAngle);
 
     // Populate the transparentObjects array with the other objects
     transparentObjects = new GameObject[3];
@@ -77,16 +88,16 @@ public class ObjectController : MonoBehaviour
     hasRotated = false;
 }
 
-
-    void Update()
+void Update()
+{
+    // Ensure the rotating object only rotates once, if it hasn't already been rotated
+    if (!hasRotated && rotatingObject != null)
     {
-        // Rotate the selected rotating object if it hasn't already been rotated
-        if (!hasRotated && rotatingObject != null)
-        {
-            rotatingObject.transform.Rotate(rotationAxis * 90f, Space.Self);
-            hasRotated = true;
-        }
+        rotatingObject.transform.Rotate(rotationAxis * 90f, Space.Self);
+        hasRotated = true;
     }
+}
+
 
     void SetChildImageTransparency(GameObject parentObj, float alphaValue)
     {
@@ -111,13 +122,14 @@ public class ObjectController : MonoBehaviour
     public bool CheckRotation(GameObject obj)
     {
         float rotationZ = obj.transform.rotation.eulerAngles.z;
-        return rotationZ > 0f;
+        return rotationZ == 90f;
     }
 
     public void OnVerButtonClick()
     {
         if (!CheckRotation(rotatingObject))
         {
+            Debug.Log("OnVerButtonClick");
             IncreaseScore();
             instructionText.text = "Correct! The object was rotated vertically. Proceed to the next question.";
         }

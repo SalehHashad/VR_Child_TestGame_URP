@@ -1,192 +1,232 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;  // Add the TextMeshPro namespace
-using System.Linq;
-using System.Collections;
-using System.Collections.Generic;  // Add this for List<>
+using TMPro;
 
 public class MemoryRecallGame : MonoBehaviour
 {
     // Game settings
-    public int gridSize = 12;
-    public int sequenceLength = 2;
-    public float sequenceSpeed = 1f;
-    public float recallTimeLimit = 10f;  // Default time limit for recall
-    private float recallStartTime;
+    private int currentLevel = 1; // Start at Level 1
+    public int questionsPerLevel = 50; // Number of sequences per level
+    private float questionCounter = 1;
 
-    // UI elements
     public GameObject squarePrefab;
     public Transform gridParent;
-    public TextMeshProUGUI scoreText;  // Use TextMeshProUGUI for score
-    public TextMeshProUGUI feedbackText;  // Use TextMeshProUGUI for feedback
-    public Button recallButton;
+    public TextMeshProUGUI scoreText;
+    public TextMeshProUGUI feedbackText;
+    public TextMeshProUGUI recallTimeText;
+    public TextMeshProUGUI LevelText;
+    public TextMeshProUGUI questionCounterText;
 
-    // Variables
     private List<GameObject> squares = new List<GameObject>();
-    private List<int> sequence = new List<int>();  // The sequence of colored squares
+    private List<int> sequence = new List<int>();
+    private List<int> userSequence = new List<int>();
     private int score = 0;
-
     private bool isRecalling = false;
+
+    private float recallStartTime;
+    private float recallTime ;
+    private float recallEndTime ;
+
+    // Level configurations
+    private class LevelConfig
+    {
+        public int gridSize;
+        public int sequenceStartLength;
+        public float sequenceSpeed;
+
+        public LevelConfig(int gridSize, int sequenceStartLength, float sequenceSpeed)
+        {
+            this.gridSize = gridSize;
+            this.sequenceStartLength = sequenceStartLength;
+            this.sequenceSpeed = sequenceSpeed;
+        }
+    }
+
+    private List<LevelConfig> levels = new List<LevelConfig>
+    {
+        new LevelConfig(6, 2, 5f),   // Level 1
+        new LevelConfig(9, 3, 4f),   // Level 2
+        new LevelConfig(12, 4, 3f),  // Level 3
+        new LevelConfig(16, 4, 2.5f),// Level 4
+        new LevelConfig(20, 4, 2f),  // Level 5
+    };
 
     void Start()
     {
-        InitializeGrid();
-        recallButton.onClick.AddListener(OnRecallButtonClicked);
         StartNextLevel();
+        scoreText.text = $"Score: {score}";
     }
-
-    // Initializes the grid of squares
-    void InitializeGrid()
+    void Update()
     {
-        for (int i = 0; i < gridSize; i++)
-        {
-            GameObject square = Instantiate(squarePrefab, gridParent);
-            square.GetComponent<Image>().color = Color.gray;  // Gray squares initially
-            squares.Add(square);
-        }
+        scoreText.text = $"Score: {score}";
+        // recallTimeText.text=$"Time {recallTime}";
+        LevelText.text=$"Level {currentLevel}";
+        questionCounterText.text=$"Question{questionCounter}/{questionsPerLevel}";
     }
 
-    // Starts the next level with updated parameters
+    // Starts the next level or question
     void StartNextLevel()
     {
-        // Increase the difficulty (change grid size, sequence length, and speed)
-        AdjustLevelSettings();
+        if (currentLevel > levels.Count)
+        {
+            // Infinite scaling after Level 5
+            levels.Add(new LevelConfig(20, levels[4].sequenceStartLength + (currentLevel - 5), Mathf.Max(1f, levels[4].sequenceSpeed - 0.1f)));
+        }
+
+        LevelConfig config = levels[currentLevel - 1];
+        InitializeGrid(config.gridSize);
         sequence.Clear();
+        userSequence.Clear();
 
-        // Generate a new sequence
-        GenerateSequence();
-
-        // Start showing the sequence to the player
-        StartCoroutine(ShowSequence());
+        GenerateSequence(config.sequenceStartLength);
+        StartCoroutine(ShowSequence(config.sequenceSpeed));
     }
 
-    // Adjust settings for the next level
-    void AdjustLevelSettings()
+    void InitializeGrid(int gridSize)
+{
+    // Destroy any existing cubes from the previous level
+    foreach (Transform child in gridParent)
     {
-        sequenceLength++;
-        sequenceSpeed = Mathf.Max(0.5f, sequenceSpeed - 0.1f); // Make the sequence faster with each level
-
-        // Update grid size and recall time limit based on difficulty
-        if (sequenceLength <= 2)
-        {
-            gridSize = 6;
-            recallTimeLimit = 10f;
-        }
-        else if (sequenceLength <= 4)
-        {
-            gridSize = 9;
-            recallTimeLimit = 8f;
-        }
-        else if (sequenceLength <= 6)
-        {
-            gridSize = 12;
-            recallTimeLimit = 7f;
-        }
-        else if (sequenceLength <= 8)
-        {
-            gridSize = 16;
-            recallTimeLimit = 6f;
-        }
-        else
-        {
-            gridSize = 20;
-            recallTimeLimit = 5f;
-        }
-
-        // Clear any previous squares
-        foreach (Transform child in gridParent)
-        {
-            Destroy(child.gameObject);
-        }
-
-        // Reinitialize the grid with updated grid size
-        InitializeGrid();
+        Destroy(child.gameObject);
     }
 
-    // Generate a sequence of colored squares
-    void GenerateSequence()
-    {
-        for (int i = 0; i < sequenceLength; i++)
-        {
-            int randomSquare = Random.Range(0, gridSize);  // Select random square
-            sequence.Add(randomSquare);
-        }
-    }
+    squares.Clear();
 
-    // Show the sequence to the player
-    IEnumerator ShowSequence()
+    float gap = 2f;
+    int gridColumns = Mathf.CeilToInt(Mathf.Sqrt(gridSize));
+
+    for (int i = 0; i < gridSize; i++)
     {
-        feedbackText.text = "Remember the sequence!";
+        // Instantiate the cube from prefab
+        GameObject square = Instantiate(squarePrefab, gridParent);
         
-        // Set the squares to red according to the sequence
-        foreach (int index in sequence)
-        {
-            squares[index].GetComponent<Image>().color = Color.red;
+        // Set the cube's position in the grid
+        float x = (i % gridColumns) * gap;
+        float y = (i / gridColumns) * gap;
+      
+        if(gridSize==12||gridSize==16){
+            square.transform.localPosition = new Vector3(x-(gap/2), y, 0);
+        }
+        else if(gridSize==20){
+            square.transform.localPosition = new Vector3(x-(gap), y, 0);
+        }
+        else{  
+            square.transform.localPosition = new Vector3(x, y, 0);
         }
 
-        // Wait for the sequence to be visible for the specified time
-        yield return new WaitForSeconds(sequenceSpeed * sequenceLength);
-
-        // Hide the squares again (back to gray)
-        foreach (int index in sequence)
+        // Ensure the CubeInteraction script is initialized with the right data
+        CubeInteraction cubeInteraction = square.GetComponent<CubeInteraction>();
+        if (cubeInteraction != null)
         {
-            squares[index].GetComponent<Image>().color = Color.gray;
+            cubeInteraction.Setup(this, i);  // Pass the current MemoryRecallGame instance and cube index
         }
 
-        // Start the recall phase
-        StartRecallPhase();
+        // Add the cube to the list
+        squares.Add(square);
     }
+}
 
-    // Start the recall phase where the player inputs the sequence
-    void StartRecallPhase()
+
+    // Generate a sequence for the current level
+    void GenerateSequence(int length)
     {
-        isRecalling = true;
-        recallStartTime = Time.time;
-        feedbackText.text = "Recall the sequence!";
+        for (int i = 0; i < length; i++)
+        {
+            sequence.Add(Random.Range(0, squares.Count));
+        }
     }
 
-    // Handle the recall input
-    void OnRecallButtonClicked()
+    IEnumerator ShowSequence(float baseSpeed)
+{
+    feedbackText.text = "Memorize the sequence!";
+    for (int i = 0; i < sequence.Count; i++)
+    {
+        int index = sequence[i];
+        Renderer renderer = squares[index].GetComponent<Renderer>();
+        renderer.material.color = Color.red;
+
+        // Adjust speed dynamically: speed decreases as questionCounter increases
+        float adjustedSpeed = baseSpeed / (1 + (questionCounter / 10));
+        yield return new WaitForSeconds(adjustedSpeed);
+
+        // Reset previous cube to gray
+        renderer.material.color = Color.gray;
+    }
+
+    feedbackText.text = "Click the cubes to recall the sequence!";
+    recallStartTime = Time.time;
+    isRecalling = true;
+}
+
+
+    // Handle user clicks
+    public void OnCubeClicked(int index)
     {
         if (!isRecalling) return;
 
-        float recallDuration = Time.time - recallStartTime;
+        userSequence.Add(index);
+        squares[index].GetComponent<Renderer>().material.color = Color.yellow;
+
+        // Check if the sequence is complete
+        if (userSequence.Count == sequence.Count)
+        {
+            EvaluateUserSequence();
+        }
+    }
+
+    // Evaluate the user's sequence
+    void EvaluateUserSequence()
+    {
+        isRecalling = false;
+
+        recallEndTime = Time.time;
+        recallTime = recallEndTime - recallStartTime;
+
+        recallTimeText.text=$"Time {recallTime}";
+
         int correctCount = 0;
 
-        // Check the player's recall against the sequence
         for (int i = 0; i < sequence.Count; i++)
         {
-            // Check if the player selected the correct square for the sequence
-            if (squares[sequence[i]].GetComponent<Image>().color == Color.red)
+            if (userSequence[i] == sequence[i])
             {
                 correctCount++;
             }
         }
 
-        // Calculate score based on correct recall
-        score += correctCount;
+        // Calculate points
+        int points = correctCount; // Base points
+        if (recallTime <= 5f)
+{
+    recallTimeText.color = Color.green;
+     points += 2; // Bonus for completing in under 5 seconds
+}
+else if (recallTime <= 10f)
+{
+      points += 1; // Bonus for completing in under 10 seconds
+    recallTimeText.color = Color.yellow;
+}
+else
+{
+    recallTimeText.color = Color.red;
+}
 
-        // Provide feedback on timing and correct responses
-        if (recallDuration < 5f)
+
+        score += points;
+        questionCounter++;
+
+        scoreText.text = $"Score: {score}";
+        feedbackText.text = $"You got {correctCount}/{sequence.Count} correct! (+{points} points)";
+
+        if (questionCounter >= questionsPerLevel)
         {
-            score += 2;  // Bonus points for fast recall
-            feedbackText.text = $"Well done! You recalled in {recallDuration:0.0}s!";
-        }
-        else if (recallDuration < 10f)
-        {
-            score += 1;  // Bonus points for completing under 10 seconds
-            feedbackText.text = $"Nice! You recalled in {recallDuration:0.0}s!";
-        }
-        else
-        {
-            feedbackText.text = $"You took too long. Try again!";
+            currentLevel++;
+            questionCounter = 0;
+            feedbackText.text = $"Level Up! Welcome to Level {currentLevel}.";
         }
 
-        // Update score display
-        scoreText.text = "Score: " + score;
-
-        // Move to the next level after a brief pause
-        Invoke("StartNextLevel", 2f);
+        Invoke(nameof(StartNextLevel), 2f);
     }
 }
