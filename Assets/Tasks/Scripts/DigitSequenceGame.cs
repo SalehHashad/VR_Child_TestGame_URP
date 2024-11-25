@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using TMPro;  // Import TextMeshPro namespace
+using TMPro;
 using UnityEngine.UI;
 
 public class DigitSequenceGame : MonoBehaviour
@@ -42,6 +42,8 @@ public GameObject resultsUI;
 private float totalResponseTime = 0f;
 private int correctResponses = 0;
 private int totalQuestions = 0;
+private int consecutiveWrong = 0;
+public int maxconsecutiveWrong = 4;
 
     void Start()
     {
@@ -137,13 +139,18 @@ private int totalQuestions = 0;
         correctResponses++; // Increment correct responses if the answer is correct
         instructionText.text = "Correct!";
         PlaySound(correctSound);
+        consecutiveWrong=0;
     }
     else
     {
+        consecutiveWrong++;
         instructionText.text = "Incorrect!";
         PlaySound(incorrectSound);
     }
-
+if(consecutiveWrong==maxconsecutiveWrong)
+{
+    DisplayResults();
+}
     totalQuestions++; // Increment total questions counter
     scoreText.text = "Score: " + score;
 

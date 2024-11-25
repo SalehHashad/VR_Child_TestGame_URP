@@ -154,6 +154,18 @@ public class MemoryRecallGame : MonoBehaviour
         // Reset previous cube to gray
         renderer.material.color = Color.gray;
     }
+    foreach (Transform child in gridParent)
+    {
+         Renderer renderer = child.GetComponent<Renderer>();
+        // Reset previous cube to gray
+        renderer.material.color = Color.black;
+    }
+    // for (int i = 0; i < sequence.Count; i++)
+    // {
+    //     int index = sequence[i];
+       
+    //     // GetComponent<Renderer>().material.color = Color.black;
+    // }
 
     feedbackText.text = "Click the cubes to recall the sequence!";
     recallStartTime = Time.time;

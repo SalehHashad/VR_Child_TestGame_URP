@@ -136,7 +136,7 @@ public class NumberPresentation : MonoBehaviour
         float countdown = startDelay;
         while (countdown > 0)
         {
-            taskTimerDisplay.text = $"Starting in: {countdown:F1}s"; // Update countdown UI
+            taskTimerDisplay.text = $"Starting in: {countdown:F0}"; // Update countdown UI
             countdown -= Time.deltaTime;
             yield return null;
         }

@@ -24,6 +24,7 @@ public class DigitMemoryGame : MonoBehaviour
     [SerializeField] private GameObject resultsPanel; // Panel UI
     [SerializeField] private GameObject TaskUI; // Panel UI
     [SerializeField] private GameObject OnboardingUI; // Panel UI
+    // [SerializeField] private GameObject Keyboard; // Panel UI
 
     [Header("Game Settings")]
     [SerializeField] private int SequencePerLevel=20; // Panel UI
@@ -58,12 +59,21 @@ public class DigitMemoryGame : MonoBehaviour
         TaskUI.SetActive(false);
         OnboardingUI.SetActive(true);
     }
+    public void SetLevelAndStartTask(int level)
+    {
+        currentLevel = level; // Set the selected level
+        Debug.Log("Current Level: " + currentLevel); // Debugging purpose
+
+        // Call StartClick to begin the task
+        StartClick();
+    }
 
    // This function is called to start the task with a countdown
     public void StartClick()
     {
         // Activate the TaskUI and start a countdown before setting isTaskOn to true
         OnboardingUI.SetActive(false);  // Deactivate Onboarding UI
+        resultsPanel.SetActive(false);  // Deactivate Onboarding UI
         TaskUI.SetActive(true);  // Activate Task UI
         StartCoroutine(CountdownBeforeStart());
     }
@@ -72,7 +82,13 @@ public class DigitMemoryGame : MonoBehaviour
     IEnumerator CountdownBeforeStart()
     {
         instructionText.text = "Task starting in 5 seconds...";
-        yield return new WaitForSeconds(5);  // Wait for 5 seconds
+        
+        for (int i = 0; i < 5; i++)
+        {
+            instructionText.text = $"Task starting in {5-i} seconds...";
+            yield return new WaitForSeconds(1);  // Wait for 1 seconds
+        }
+        
         
         instructionText.text = "Task Started!";
 
@@ -126,56 +142,72 @@ public class DigitMemoryGame : MonoBehaviour
     }
 
     void GenerateNewSequence()
+{
+    currentSequence.Clear();
+    answerInput.text = "";
+
+    // Adjust sequence length based on current level and sequence in level
+    if (currentLevel == 1)
     {
-        currentSequence.Clear();
-        answerInput.text = "";
-
-        // Adjust sequence length based on current level and sequence in level
-        if (currentLevel == 1)
-        {
-            sequenceLength = Mathf.Clamp(2 + sequenceInLevel, 2, 10);
-        }
-        else if (currentLevel == 2)
-        {
-            sequenceLength = Mathf.Clamp(2 + sequenceInLevel, 2, 10);
-        }
-        else if (currentLevel == 3)
-        {
-            sequenceLength = Mathf.Clamp(3 + sequenceInLevel, 3, 11);
-        }
-        else if (currentLevel == 4)
-        {
-            sequenceLength = Mathf.Clamp(4 + sequenceInLevel, 4, 12);
-        }
-        else if (currentLevel == 5)
-        {
-            sequenceLength = Mathf.Clamp(5 + sequenceInLevel, 5, 13);
-        }
-
-        instructionText.text = (currentLevel == 1) ? "Memorize the sequence." : "Enter the sequence in reverse order.";
-
-        for (int i = 0; i < sequenceLength; i++)
-        {
-            currentSequence.Add(Random.Range(0, 10));
-        }
-        UpdateLevelUI();
-
-        StartCoroutine(DisplaySequence());
+        sequenceLength = Mathf.Clamp(2 + sequenceInLevel, 2, 10);
     }
+    else if (currentLevel == 2)
+    {
+        sequenceLength = Mathf.Clamp(2 + sequenceInLevel, 2, 10);
+    }
+    else if (currentLevel == 3)
+    {
+        sequenceLength = Mathf.Clamp(3 + sequenceInLevel, 3, 11);
+    }
+    else if (currentLevel == 4)
+    {
+        sequenceLength = Mathf.Clamp(4 + sequenceInLevel, 4, 12);
+    }
+    else if (currentLevel == 5)
+    {
+        sequenceLength = Mathf.Clamp(5 + sequenceInLevel, 5, 13);
+    }
+
+    instructionText.text = (currentLevel == 1) ? "Memorize the sequence." : "Enter the sequence in reverse order.";
+
+    int previousNumber = -1; // Initialize to a value that cannot occur (digits are 0-9)
+
+    for (int i = 0; i < sequenceLength; i++)
+    {
+        int newNumber;
+        do
+        {
+            newNumber = Random.Range(0, 10); // Generate a number between 0 and 9
+        } 
+        while (newNumber == previousNumber); // Ensure it's not the same as the last number
+
+        currentSequence.Add(newNumber);
+        previousNumber = newNumber; // Update the last number
+    }
+
+    UpdateLevelUI();
+
+    StartCoroutine(DisplaySequence());
+}
+
 
     IEnumerator DisplaySequence()
     {
+        answerInput.interactable = false; // disEnable the input field
         // Create a copy of the current sequence to avoid modifying it while enumerating
         List<int> sequenceToDisplay = new List<int>(currentSequence);
 
         foreach (int digit in sequenceToDisplay)
         {
+            
             displayText.text = digit.ToString();
+            answerInput.text = "";
             yield return new WaitForSeconds(1);
         }
 
         displayText.text = "";
         instructionText.text = (currentLevel == 1) ? "Enter the sequence." : "Enter the sequence in reverse order.";
+        answerInput.interactable = true; // Enable the input field
     }
 
     public void CheckUserResponse()
@@ -188,6 +220,7 @@ public class DigitMemoryGame : MonoBehaviour
         {
             for (int i = 0; i < currentSequence.Count; i++)
             {
+                
                 correctAnswer += currentSequence[i].ToString();
             }
         }
@@ -206,6 +239,7 @@ public class DigitMemoryGame : MonoBehaviour
         }
         else
         {
+            answerInput.text = "";
             PlaySound(incorrectSound);
             HandleIncorrectResponse();
         }

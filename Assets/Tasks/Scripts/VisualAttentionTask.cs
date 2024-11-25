@@ -29,7 +29,8 @@ public class VisualAttentionTask : MonoBehaviour
     private int correctTrackingStreak = 0; // To track consecutive correct answers
     private int correctRedObjectsCount = 0; // Count of correctly tracked red objects
     private int totalRedObjects = 0; // Total red objects for the round
-
+private int consecutiveWrong = 0;
+public int maxconsecutiveWrong = 4;
     private GameObject boundary;
 
     private void Start()
@@ -220,12 +221,21 @@ private IEnumerator RevertColorCoroutine(GameObject ball, float delay)
             // score += correctTrackingStreak; // Bonus for consecutive correct trackings
             instructionsText.text = "Correct tracking! Streak: " + correctTrackingStreak;
             StartLevel(level);
+            consecutiveWrong=0;
         }
         else
         {
+           consecutiveWrong++;
             correctTrackingStreak=0;
             instructionsText.text = "You missed some red objects.";
         }
+        if(consecutiveWrong==maxconsecutiveWrong)
+{
+    Question+=1;
+            // score += correctTrackingStreak; // Bonus for consecutive correct trackings
+            instructionsText.text = $"You missed {consecutiveWrong} times";
+            StartLevel(level);
+}
     }
 }
 

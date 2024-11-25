@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.61336035, g: 0.48126578, b: 0.4730206, a: 1}
+  m_IndirectSpecularColor: {r: 0.61336035, g: 0.48126578, b: 0.4730205, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -14331,6 +14331,10 @@ PrefabInstance:
       propertyPath: m_MaxRaycastDistance
       value: 200
       objectReference: {fileID: 0}
+    - target: {fileID: 8093766987109025286, guid: 125fd30f34e618b43864a81f42452a59, type: 3}
+      propertyPath: m_SelectAction.m_Reference
+      value: 
+      objectReference: {fileID: -5982496924579745919, guid: c348712bda248c246b8c49b3db54643f, type: 3}
     - target: {fileID: 8093766987692385893, guid: 125fd30f34e618b43864a81f42452a59, type: 3}
       propertyPath: m_BackGroundColor.a
       value: 1
@@ -14347,6 +14351,10 @@ PrefabInstance:
       propertyPath: m_BackGroundColor.r
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8093766987872405222, guid: 125fd30f34e618b43864a81f42452a59, type: 3}
+      propertyPath: m_SelectAction.m_Reference
+      value: 
+      objectReference: {fileID: 83097790271614945, guid: c348712bda248c246b8c49b3db54643f, type: 3}
     - target: {fileID: 8333697823899183381, guid: 125fd30f34e618b43864a81f42452a59, type: 3}
       propertyPath: m_MaxRaycastDistance
       value: 200
@@ -18874,7 +18882,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6598815579406187037, guid: 18ddb545287c546e19cc77dc9fbb2189, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -29082,13 +29090,14 @@ MonoBehaviour:
   startingObjects: 4
   speed: 3
   level: 1
-  QuestionPerLevel: 5
+  QuestionPerLevel: 20
   roundTime: 10
   levelText: {fileID: 553715807}
   scoreText: {fileID: 530012827}
   questionText: {fileID: 1468823183}
   instructionsText: {fileID: 411643548}
   timerText: {fileID: 1685863584}
+  maxconsecutiveWrong: 2
 --- !u!1001 &1714741047
 PrefabInstance:
   m_ObjectHideFlags: 0
