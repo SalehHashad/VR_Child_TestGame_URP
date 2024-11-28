@@ -51,6 +51,7 @@ public int maxconsecutiveWrong = 4;
         // Debug.Log("Current Level: " + currentLevel); // Debugging purpose
         level=lvl;
   score=0;
+  Question = 0;
   UpdateUI();
         // Call StartClick to begin the task
         StartLevel(lvl);
@@ -58,6 +59,7 @@ public int maxconsecutiveWrong = 4;
 
     void StartLevel(int level)
     {
+        
          instructionsText.text = " ";
         roundActive=true;
         SetLevelParameters(level);
@@ -93,8 +95,11 @@ public int maxconsecutiveWrong = 4;
 
     void SetLevelParameters(int level)
     {
+
         startingObjects = 4 + level; // Increase objects each level
-        speed = 3f + level * 0.5f* Question; // Increase speed slightly each level
+        if(level==5)
+        startingObjects=8;
+        speed = 1f + level * 0.5f* Question; // Increase speed slightly each level
         currentTime=roundTime-level+1;
     }
 
@@ -103,6 +108,8 @@ public int maxconsecutiveWrong = 4;
     {
         correctRedObjectsCount = 0; // Reset count for new round
         totalRedObjects = level; // Number of red objects based on level
+        if(level==5)
+        totalRedObjects=level-1;
 
         for (int i = 0; i < startingObjects; i++)
         {
@@ -226,6 +233,17 @@ private IEnumerator RevertColorCoroutine(GameObject ball, float delay)
     {
         score -= 1; // Decrement score
         instructionsText.text = "Oops! That wasn't a red ball.";
+        consecutiveWrong++;
+        
+        correctTrackingStreak = 0;
+        
+
+        if (consecutiveWrong >= maxconsecutiveWrong)
+        {
+            instructionsText.text = $"Too many misses ({consecutiveWrong}/{maxconsecutiveWrong}). Resetting level.";
+            consecutiveWrong=0;
+            StartLevel(level);
+        }
     }
 
     // Check if the task should end due to low score
@@ -267,16 +285,7 @@ private IEnumerator EndTask()
     }
     else
     {
-        consecutiveWrong++;
-        correctTrackingStreak = 0;
         
-
-        if (consecutiveWrong >= maxconsecutiveWrong)
-        {
-            instructionsText.text = $"Too many misses ({consecutiveWrong}/{maxconsecutiveWrong}). Resetting level.";
-            consecutiveWrong=0;
-            StartLevel(level);
-        }
     }
 }
 
