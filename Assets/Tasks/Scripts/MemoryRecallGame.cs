@@ -29,6 +29,18 @@ public class MemoryRecallGame : MonoBehaviour
     private float recallTime ;
     private float recallEndTime ;
 
+    private int totalErrors = 0; // Track the total errors for the level
+public  int maxErrors = 4; // The maximum allowed errors per level
+
+
+    [Header("Audio Feedback")]
+    [SerializeField] private AudioClip correctSound;
+    [SerializeField] private AudioClip incorrectSound;
+    private AudioSource audioSource;
+
+    public GameObject taskUI;
+public GameObject onboardingUI;
+
     // Level configurations
     private class LevelConfig
     {
@@ -52,10 +64,26 @@ public class MemoryRecallGame : MonoBehaviour
         new LevelConfig(16, 4, 2.5f),// Level 4
         new LevelConfig(20, 4, 2f),  // Level 5
     };
+void PlaySound(AudioClip clip)
+    {
+        audioSource.clip = clip;
+        audioSource.Play();
+    }
+    public void StartTask()
+{
+    // Activate the task UI and deactivate the onboarding UI
+    taskUI.SetActive(true);
+    onboardingUI.SetActive(false);
 
+    // Start the first level after task starts
+    StartNextLevel();
+}
     void Start()
     {
-        StartNextLevel();
+        audioSource = gameObject.AddComponent<AudioSource>();
+        // StartNextLevel();
+        taskUI.SetActive(false);
+        onboardingUI.SetActive(true);
         scoreText.text = $"Score: {score}";
     }
     void Update()
@@ -69,6 +97,7 @@ public class MemoryRecallGame : MonoBehaviour
     // Starts the next level or question
     void StartNextLevel()
     {
+       
         if (currentLevel > levels.Count)
         {
             // Infinite scaling after Level 5
@@ -132,10 +161,20 @@ public class MemoryRecallGame : MonoBehaviour
     // Generate a sequence for the current level
     void GenerateSequence(int length)
     {
+        int previousNumber = -1; // Initialize to a value that cannot occur (digits are 0-9)
+
         for (int i = 0; i < length; i++)
         {
-            sequence.Add(Random.Range(0, squares.Count));
+        int newNumber;
+        do
+        {
+            newNumber = Random.Range(0, squares.Count); // Generate a number between 0 and 9
+        } 
+        while (newNumber == previousNumber); // Ensure it's not the same as the last number
+        sequence.Add(newNumber);
+        previousNumber = newNumber; // Update the last number
         }
+        
     }
 
     IEnumerator ShowSequence(float baseSpeed)
@@ -173,72 +212,146 @@ public class MemoryRecallGame : MonoBehaviour
 }
 
 
-    // Handle user clicks
+   
     public void OnCubeClicked(int index)
+{
+    if (!isRecalling) return;
+
+    userSequence.Add(index);
+
+    // Start the color change coroutine for the clicked cube
+    StartCoroutine(FadeToBlack(squares[index].GetComponent<Renderer>()));
+
+    // Check if the sequence is complete
+    if (userSequence.Count == sequence.Count)
     {
-        if (!isRecalling) return;
-
-        userSequence.Add(index);
-        squares[index].GetComponent<Renderer>().material.color = Color.yellow;
-
-        // Check if the sequence is complete
-        if (userSequence.Count == sequence.Count)
-        {
-            EvaluateUserSequence();
-        }
+        EvaluateUserSequence();
     }
+}
+
+    IEnumerator FadeToBlack(Renderer renderer)
+{
+    // Check if the renderer or its GameObject is still valid
+    if (renderer == null || renderer.gameObject == null)
+    {
+        yield break; // Exit the coroutine if the renderer is null
+    }
+
+    Color startColor = Color.yellow;
+    Color endColor = Color.black;
+    float duration = 1f; // Duration of the fade effect
+    float elapsed = 0f;
+
+    while (elapsed < duration)
+    {
+        // Check again if the object is still valid
+        if (renderer == null || renderer.gameObject == null)
+        {
+            yield break; // Exit the coroutine if the renderer is destroyed
+        }
+
+        elapsed += Time.deltaTime;
+        renderer.material.color = Color.Lerp(startColor, endColor, elapsed / duration);
+        yield return null;
+    }
+
+    // Final color set
+    if (renderer != null && renderer.gameObject != null)
+    {
+        renderer.material.color = endColor; // Ensure the color is fully black at the end
+    }
+}
+
+
 
     // Evaluate the user's sequence
     void EvaluateUserSequence()
+{
+    isRecalling = false;
+
+    recallEndTime = Time.time;
+    recallTime = recallEndTime - recallStartTime;
+
+    recallTimeText.text = $"Time {recallTime}";
+
+    int correctCount = 0;
+    
+
+    // Loop through the user sequence and compare with the correct sequence
+    for (int i = 0; i < sequence.Count; i++)
     {
-        isRecalling = false;
-
-        recallEndTime = Time.time;
-        recallTime = recallEndTime - recallStartTime;
-
-        recallTimeText.text=$"Time {recallTime}";
-
-        int correctCount = 0;
-
-        for (int i = 0; i < sequence.Count; i++)
+        if (userSequence[i] == sequence[i])
         {
-            if (userSequence[i] == sequence[i])
-            {
-                correctCount++;
-            }
+            correctCount++;
+            PlaySound(correctSound);
         }
-
-        // Calculate points
-        int points = correctCount; // Base points
-        if (recallTime <= 5f)
-{
-    recallTimeText.color = Color.green;
-     points += 2; // Bonus for completing in under 5 seconds
-}
-else if (recallTime <= 10f)
-{
-      points += 1; // Bonus for completing in under 10 seconds
-    recallTimeText.color = Color.yellow;
-}
-else
-{
-    recallTimeText.color = Color.red;
-}
-
-
-        score += points;
-        questionCounter++;
-
-        scoreText.text = $"Score: {score}";
-        feedbackText.text = $"You got {correctCount}/{sequence.Count} correct! (+{points} points)";
-
-        if (questionCounter >= questionsPerLevel)
+        else
         {
-            currentLevel++;
-            questionCounter = 0;
-            feedbackText.text = $"Level Up! Welcome to Level {currentLevel}.";
+            totalErrors++;  // Increment error count if the user clicked wrong
+            PlaySound(incorrectSound);
         }
-
-        Invoke(nameof(StartNextLevel), 2f);
     }
+
+    // Calculate points
+    int points = correctCount; // Base points for correct sequence matches
+    if (recallTime <= 5f)
+    {
+        recallTimeText.color = Color.green;
+        points += 2; // Bonus for completing in under 5 seconds
+    }
+    else if (recallTime <= 10f)
+    {
+        points += 1; // Bonus for completing in under 10 seconds
+        recallTimeText.color = Color.yellow;
+    }
+    else
+    {
+        recallTimeText.color = Color.red;
+    }
+
+    score += points; // Add points to the score
+    questionCounter++;
+
+    scoreText.text = $"Score: {score}";
+    feedbackText.text = $"You got {correctCount}/{sequence.Count} correct! (+{points} points)\nTotal errors: {totalErrors}/{maxErrors}";
+
+    // Check if errors exceed the limit
+    if (totalErrors >= maxErrors)
+    {
+        feedbackText.text = $"Maximum errors reached! Level failed.\nTotal errors: {totalErrors}/{maxErrors}";
+        EndTask(); // End the level if max errors reached
+        return;
+    }
+
+    // Check if the level is complete (all questions are done)
+    if (questionCounter >= questionsPerLevel)
+    {
+         totalErrors = 0; // Reset errors for this evaluation
+        currentLevel++;
+        questionCounter = 0;
+        feedbackText.text = $"Level Up! Welcome to Level {currentLevel}.";
+    }
+
+    // Delay before starting the next level
+    Invoke(nameof(StartNextLevel), 2f);
+}
+void EndTask()
+{
+    // Display final feedback message
+    if (totalErrors >= maxErrors)
+    {
+        feedbackText.text = $"Task Over! You reached the maximum errors ({totalErrors}/{maxErrors}).\nBetter luck next time!";
+    }
+    else
+    {
+        feedbackText.text = $"Task Completed! \nTotal score: {score}";
+    }
+
+    // Disable further inputs or actions, effectively "ending" the task
+    isRecalling = false;  // Stop recall process
+    userSequence.Clear();  // Clear the user's sequence for the next task
+
+    
+}
+
 }

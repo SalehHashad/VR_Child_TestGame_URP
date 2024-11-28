@@ -52,6 +52,14 @@ public int maxconsecutiveWrong = 4;
         wrongButton.onClick.AddListener(OnWrongButtonClicked);
         StartNewSequence();
     }
+    public void SetLevelAndStartTask(int level)
+    {
+        currentLevel = level-1; // Set the selected level
+        Debug.Log("Current Level: " + currentLevel); // Debugging purpose
+
+        // Call StartClick to begin the task
+        StartNewSequence();
+    }
 
     private void StartNewSequence()
     {
@@ -59,9 +67,12 @@ public int maxconsecutiveWrong = 4;
         instructionText.text = "Memorize the sequence!";
         rightButton.gameObject.SetActive(false);
         wrongButton.gameObject.SetActive(false);
+        resultsUI.gameObject.SetActive(false);
+        TaskUI.gameObject.SetActive(true);
         responseTimeText.text = "";
         questionText.text = "Question: " + (questionCount + 1) + " / " + maxQuestionsPerLevel;
         levelText.text = "Level: " + (currentLevel + 1);
+        scoreText.text = "Score: " + score;
         StartCoroutine(DisplaySequence());
     }
     

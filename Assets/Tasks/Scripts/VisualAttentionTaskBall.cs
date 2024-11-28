@@ -5,26 +5,11 @@ public class VisualAttentionTaskBall : MonoBehaviour
     private Material ballMaterial;
     private Color originalColor;
     private bool isRed; // Track if the ball is currently red
+    private bool hasBeenClicked = false; // Track if the ball has been clicked
     private VisualAttentionTask taskManager; // Reference to the main task manager
 
     public Color hoverColor = Color.yellow; // Color when hovered over
-    
 
-    // void Start()
-    // {
-    //     // Find the Renderer component and store the material
-    //     Renderer ballRenderer = GetComponent<Renderer>() ?? GetComponentInChildren<Renderer>();
-        
-    //     if (ballRenderer != null)
-    //     {
-    //         ballMaterial = ballRenderer.material; // Assign the material
-    //         originalColor = ballMaterial.color; // Store the original color
-    //     }
-    //     else
-    //     {
-    //         Debug.LogError("Renderer component not found on " + gameObject.name + " or its children.");
-    //     }
-    // }
     private void Start()
     {
         Renderer renderer = GetComponent<Renderer>();
@@ -37,6 +22,8 @@ public class VisualAttentionTaskBall : MonoBehaviour
         // Get reference to VisualAttentionTask script
         taskManager = FindObjectOfType<VisualAttentionTask>();
     }
+    
+
     // Method to be called on hover
     public void OnHoverEnter()
     {
@@ -49,9 +36,12 @@ public class VisualAttentionTaskBall : MonoBehaviour
     // Method to be called on unhover
     public void OnHoverExit()
     {
-        if (ballMaterial != null)
+        if (ballMaterial != null && !hasBeenClicked)
         {
             ballMaterial.color = Color.black; // Revert to original color
+        }
+        else{
+            RevertColor();
         }
     }
 
@@ -61,7 +51,7 @@ public class VisualAttentionTaskBall : MonoBehaviour
         if (ballMaterial != null)
         {
             ballMaterial.color = Color.red;
-            // isRed = true;
+            isRed = true;
             Invoke("RevertColor", 2f); // Revert after 2 seconds
         }
     }
@@ -69,30 +59,36 @@ public class VisualAttentionTaskBall : MonoBehaviour
     // Method to revert to the original color
     private void RevertColor()
     {
-        if (originalColor == Color.red)
+        isRed = false;
+        if (ballMaterial != null)
         {
-            ballMaterial.color = originalColor;
-            isRed = true;
-        }
-        else{
-            isRed = false;
             ballMaterial.color = originalColor;
         }
     }
 
     public void OnClicked()
     {
+        if (hasBeenClicked)
+        {
+            Debug.Log("This ball has already been clicked.");
+            return; // Prevent multiple scoring from the same ball
+        }
+
         if (taskManager != null)
         {
             // Check if the ball has the "Red" tag
             if (CompareTag("Red"))
             {
                 taskManager.OnBallClicked(true); // Send true if it's a red ball
+                //  RevertColor();
             }
             else
             {
                 taskManager.OnBallClicked(false); // Send false if it's a regular ball
             }
         }
+         RevertColor();
+
+        hasBeenClicked = true; // Mark the ball as clicked
     }
 }

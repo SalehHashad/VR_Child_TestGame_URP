@@ -35,6 +35,11 @@ public class Task8 : MonoBehaviour
     public AudioClip wrongSound;     // Sound for wrong answer
     private AudioSource audioSource; // AudioSource to play sounds
 
+    // Task End Flag
+    private bool isTaskEnd = false;
+    private int consecutiveWrongAnswers = 0;
+    public int maxConsecutiveWrong = 4;
+
     void Start()
     {
         // Get the AudioSource component from the same GameObject
@@ -48,6 +53,8 @@ public class Task8 : MonoBehaviour
 
     void SetupLevel(int level)
     {
+        if (isTaskEnd) return; // Don't set up a new task if the task is already ended
+
         maxRange = GetMaxRangeForLevel(level);
         number = Random.Range(0, maxRange + 1);
         questionCount++;
@@ -116,6 +123,8 @@ public class Task8 : MonoBehaviour
 
     void HandleButtonClick(bool isLeftButton)
     {
+        if (isTaskEnd) return; // Don't handle input if task is already ended
+
         bool isCorrect = false;
 
         if (currentTaskType == TaskType.OddEven)
@@ -141,6 +150,21 @@ public class Task8 : MonoBehaviour
             {
                 isCorrect = true;
             }
+        }
+
+        // Handle wrong answers count
+        if (!isCorrect)
+        {
+            consecutiveWrongAnswers++;
+            if (consecutiveWrongAnswers >= maxConsecutiveWrong)
+            {
+                EndTask();
+                return;
+            }
+        }
+        else
+        {
+            consecutiveWrongAnswers = 0; // Reset on correct answer
         }
 
         // Play sound based on correctness
@@ -172,6 +196,26 @@ public class Task8 : MonoBehaviour
         }
 
         SetupLevel(currentLevel);
+    }
+
+    void EndTask()
+    {
+        // End the task and clear any remaining spawned objects
+        isTaskEnd = true;
+
+        // Clear the spawned shape and disable the buttons
+        if (currentShapeInstance != null)
+        {
+            Destroy(currentShapeInstance);
+        }
+
+        // Disable buttons
+        leftButton.interactable = false;
+        rightButton.interactable = false;
+
+        Debug.Log("Task ended due to 4 consecutive wrong answers.");
+        // Display task end message if desired (optional)
+        questionText.text = "Task Ended!";
     }
 
     void UpdateUI()

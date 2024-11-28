@@ -2,7 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
-
+using System.Linq;
+using UnityEngine.UI;  
 
 public class Task1 : MonoBehaviour
 {
@@ -12,7 +13,9 @@ public class Task1 : MonoBehaviour
     public TMP_Text levelText; // Displays the current level
     public TMP_Text questionCounterText; // Displays the current question
     public TMP_Text feedbackText; // Displays feedback (e.g., "Correct", "Wrong")
-
+public TextMeshProUGUI orientingText;
+    public TextMeshProUGUI executiveControlText;
+    public TextMeshProUGUI alertingText;
     // Level Prefabs
     public List<GameObject> arrowPrefabs; // Assign prefabs for each level in the Inspector
 private List<GameObject> spawnedArrows = new List<GameObject>();
@@ -26,12 +29,17 @@ private List<TrialData> trialDataList = new List<TrialData>();
     public Transform spawnPoint; // Location where targets (arrows) will appear
 
     // Configurable Parameters
-    public float fixationTime = 0.5f; // Time for fixation point display (in seconds)
+    private float fixationTime = 0.5f; // Time for fixation point display (in seconds)
+    public float fixationTimeMin = 0.5f; // Time for fixation point display (in seconds)
+    public float fixationTimeMax = 0.5f; // Time for fixation point display (in seconds)
     public float cueTime = 0.5f; // Time for cue display (in seconds)
-    public float interTrialInterval = 1.0f; // Time between trials (in seconds)
+    private float interTrialInterval = 1.0f; // Time between trials (in seconds)
+    public float interTrialIntervalMax = 1.0f; // Time between trials (in seconds)
+    public float interTrialIntervalMin = 1.0f; // Time between trials (in seconds)
 
     // Gameplay Variables
     private int currentLevel = 1; // Current game level
+    private int totalLevels = 5; // Current game level
     public int totalQuestions = 96; // Questions per level
     private int currentQuestion = 0; // Current question number
     private float responseStartTime; // Time when target appears
@@ -66,9 +74,43 @@ Vector3 targetPosition; // Default to center
 public AudioClip correctAnswerClip;
     public AudioClip wrongAnswerClip;
 
+// Configurable error thresholds
+public int maxTotalErrors = 4;          // Maximum total incorrect answers per level
+public int maxConsecutiveErrors = 2;   // Maximum consecutive incorrect answers
+
+// Class-level counters
+private int totalErrors = 0;          // Total incorrect answers per level
+private int consecutiveErrors = 0;   // Consecutive incorrect answers
+private bool isTaskEnded = false;
+public GameObject resultUI;
+
+private Button rightButtonComponent; // Reference to the Button component
+    private Button leftButtonComponent;  // Reference to the Button component
+
+   
+    public float CalculateFixationTimeAndIti(int currentLevel, int currentQuestion, bool isFixationTime)
+    {
+        // Ensure currentLevel and currentQuestion are within valid ranges
+        currentLevel = Mathf.Clamp(currentLevel, 1, totalLevels);
+        currentQuestion = Mathf.Clamp(currentQuestion, 0, totalQuestions);
+
+        // Calculate the progress factor (normalized value between 0 and 1)
+        float levelProgress = (currentLevel - 1) / (float)(totalLevels - 1);
+        float questionProgress = currentQuestion / (float)totalQuestions;
+        float overallProgress = (levelProgress + questionProgress) / 2f;
+
+        // Interpolate fixationTime between fixationTimeMax and fixationTimeMin
+        if(isFixationTime)
+        return Mathf.Lerp(fixationTimeMax, fixationTimeMin, overallProgress);
+        else
+        return Mathf.Lerp(interTrialIntervalMax, interTrialIntervalMin, overallProgress);
+    }
+
 
     void Start()
     {
+        rightButtonComponent = rightButton.GetComponent<Button>();
+        leftButtonComponent = leftButton.GetComponent<Button>();
         // Check if AudioSource is already attached to the GameObject
         audioSource = GetComponent<AudioSource>();
 
@@ -84,49 +126,87 @@ public AudioClip correctAnswerClip;
         // Assign button listeners
         rightButton.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(() => AnswerSelected("Right"));
         leftButton.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(() => AnswerSelected("Left"));
+// activate the buttons
+    if (rightButton != null) rightButton.SetActive(true);
+    if (leftButton != null) leftButton.SetActive(true);
 
-        StartCoroutine(GameFlow());
+    // deActivate the result UI
+    if (resultUI != null) resultUI.SetActive(false);
+
+        StartCoroutine(GameFlow(1));
     }
 
-    IEnumerator GameFlow()
+    public void SetLevelAndStartTask(int level)
     {
-        for (int level = 1; level <= arrowPrefabs.Count; level++) // Loop through levels
+        // currentLevel = level; // Set the selected level
+        isTaskEnded=false;
+        Debug.Log("Current Level: " + currentLevel); // Debugging purpose
+resultUI.SetActive(false);
+rightButton.SetActive(true);
+    leftButton.SetActive(true);
+    ShowFeedback(" ");
+        // Call StartClick to begin the task
+        StartCoroutine(GameFlow(level));
+    }
+
+    IEnumerator GameFlow(int lvl)
+{
+    
+    for (int level=lvl; level <= arrowPrefabs.Count; level++) // Loop through levels
+    {
+        if (isTaskEnded) yield break; // Stop if task has ended
+
+        currentLevel = level;
+        totalErrors = 0;
+        currentQuestion = 0;
+        UpdateUI();
+
+        for (int i = 0; i < totalQuestions; i++) // Loop through questions in a level
         {
-            currentLevel = level;
-            currentQuestion = 0;
+            ShowFeedback("Determine the direction for objects spawned at the center");
+            if (isTaskEnded) yield break; // Stop if task has ended
+
+            currentQuestion++;
             UpdateUI();
 
-            for (int i = 0; i < totalQuestions; i++) // Loop through questions in a level
-            {
-                currentQuestion++;
-                UpdateUI();
+            // Run a trial
+            yield return StartCoroutine(RunTrial());
+            interTrialInterval = CalculateFixationTimeAndIti(currentLevel, currentQuestion, false);
+            Debug.Log("interTrialInterval: " + interTrialInterval);
 
-                // Run a trial
-                yield return StartCoroutine(RunTrial());
-
-                // Short delay before the next trial
-                yield return new WaitForSeconds(interTrialInterval);
-            }
-
-            // Display level summary
-            ShowFeedback($"Level {level} Complete! Accuracy: {correctResponses * 100 / totalQuestions}%");
-            correctResponses=0;
-            yield return new WaitForSeconds(3.0f);
-            ClearFeedback();
+            // Short delay before the next trial
+            yield return new WaitForSeconds(interTrialInterval);
         }
 
-        // Game complete
+        // Display level summary
+        ShowFeedback($"Level {level} Complete! Accuracy: {correctResponses * 100 / totalQuestions}%");
+        correctResponses = 0;
+        yield return new WaitForSeconds(3.0f);
+        ClearFeedback();
+    }
+
+    // Game complete
+    EndTask();
+    if (!isTaskEnded)
+    {
         ShowFeedback("Task Complete! Thank you for participating.");
     }
+}
+
 
  IEnumerator RunTrial()
 {
+     rightButtonComponent.interactable = false; 
+        leftButtonComponent.interactable = false;  
+
     // Create an object to store trial data
     TrialData currentTrialData = new TrialData();
 
     trialNumber++;
     currentTrialData.trialNumber = trialNumber;
-
+    // fixationTime=Random.Range(fixationTimeMin, fixationTimeMax);
+    fixationTime=CalculateFixationTimeAndIti(currentLevel,currentQuestion,true);
+    
     // Record the fixation time (converted to seconds for usage in yield)
     currentTrialData.fixationTime = fixationTime * 1000f; // in milliseconds
 
@@ -147,13 +227,17 @@ public AudioClip correctAnswerClip;
     DisplayCue();
 
     yield return new WaitForSeconds(cueTime);
-currentTrialData.cueType = currentCueType;
+    currentTrialData.cueType = currentCueType;
     // Record Inter-Trial Interval (ITI)
     currentTrialData.iti = interTrialInterval * 1000f; // in milliseconds
     ClearCues(); // Clear any active cues
 
     // Hide cue and display target
     SpawnTarget(); // Spawn the target arrow at the spawn point
+    yield return new WaitForSeconds(fixationTime);
+    DestroyPreviousArrows();
+     rightButtonComponent.interactable = true; 
+        leftButtonComponent.interactable = true;  
 
     // Record the direction of the target
     currentTrialData.direction = currentCorrectDirection;
@@ -176,8 +260,8 @@ currentTrialData.cueType = currentCueType;
 
     // Determine accuracy based on response
     currentTrialData.accuracy = (currentTrialData.response == currentTrialData.direction) ? 1 : 0;
-correctResponses+=currentTrialData.accuracy;
-Debug.Log("correctResponses:"+correctResponses);
+    correctResponses+=currentTrialData.accuracy;
+    Debug.Log("correctResponses:"+correctResponses);
     // Log the trial data for later analysis (you can print, store in a file, or add to a list)
     LogTrialData(currentTrialData);
 
@@ -428,6 +512,7 @@ void CreateSurroundingArrows(string state, string location)
     {
         levelText.text = $"Level: {currentLevel}";
         questionCounterText.text = $"Question: {currentQuestion}/{totalQuestions}";
+        
     }
 
     void ShowFeedback(string message)
@@ -441,41 +526,133 @@ void CreateSurroundingArrows(string state, string location)
         feedbackText.gameObject.SetActive(false);
     }
 
-    void AnswerSelected(string direction)
+
+
+void AnswerSelected(string direction)
+{
+    if (!isResponding) return;
+
+    if (currentCorrectDirection == null)
     {
-        if (!isResponding) return;
-
-        if (currentCorrectDirection == null)
-        {
-            Debug.LogError("currentCorrectDirection is null!");
-            return;
-        }
-
-        if (currentTarget == null)
-        {
-            Debug.LogError("currentTarget is null!");
-            return;
-        }
-
-        float responseTime = Time.time - responseStartTime;
-        totalResponseTime += responseTime;
-
-        // Check if the response is correct
-        bool correctResponse = (direction == currentCorrectDirection);
-        participantResponse = direction;
-
-        // Provide feedback
-        ShowFeedback(correctResponse ? "Correct!" : "Wrong!");
-        StartCoroutine(HideFeedbackAfterDelay(1.0f));
-
-        // Play sound based on correctness of the response
-        PlayAnswerSound(correctResponse);
-
-        isResponding = false;
-
-        // Destroy arrows after the answer
-        DestroyPreviousArrows();
+        Debug.LogError("currentCorrectDirection is null!");
+        return;
     }
+
+    float responseTime = Time.time - responseStartTime;
+    totalResponseTime += responseTime;
+
+    // Check if the response is correct
+    bool correctResponse = (direction == currentCorrectDirection);
+    participantResponse = direction;
+
+    // Provide feedback
+    ShowFeedback(correctResponse ? "Correct!" : "Wrong!");
+    StartCoroutine(HideFeedbackAfterDelay(1.0f));
+
+    // Play sound based on correctness of the response
+    PlayAnswerSound(correctResponse);
+
+    isResponding = false;
+
+    // Update error counters
+    if (correctResponse)
+    {
+        consecutiveErrors = 0; // Reset consecutive errors on correct answer
+    }
+    else
+    {
+        totalErrors++;
+        consecutiveErrors++;
+
+        // Check if end task conditions are met
+        if (totalErrors >= maxTotalErrors || consecutiveErrors >= maxConsecutiveErrors)
+        {
+            EndTask(); // Call the end task function
+            return;    // Exit early to prevent further processing
+        }
+    }
+      rightButtonComponent.interactable = false; 
+        leftButtonComponent.interactable = false;  
+    // Destroy arrows after the answer
+    DestroyPreviousArrows();
+}
+
+void EndTask()
+{
+    Debug.Log("Task ended due to too many errors.");
+    ShowFeedback("Task ended due to too many errors.");
+    isTaskEnded = true; // Signal to stop GameFlow
+    resultUI.SetActive(true);
+rightButton.SetActive(false);
+    leftButton.SetActive(false);
+    StopAllCoroutines(); // Optionally stop all coroutines if necessary
+    // Additional logic for ending the task (e.g., showing summary screen)
+
+    // Calculate Mean Reaction Times for various conditions
+    float meanReactionTimeCentralCue = CalculateMeanReactionTimecueType("Center Cue");
+    float meanReactionTimeSpatialCue = CalculateMeanReactionTimecueType("Spatial Cue");
+    float meanReactionTimeIncongruent = CalculateMeanReactionTimecongruencyState("Incongruent");
+    float meanReactionTimeCongruent = CalculateMeanReactionTimecongruencyState("Congruent");
+    
+    // Calculate Mean Reaction Times for No Cue and Double Cue
+    float meanReactionTimeNoCue = CalculateMeanReactionTimecueType("No Cue");
+    float meanReactionTimeDoubleCue = CalculateMeanReactionTimecueType("Double Cue");
+
+    // Calculate Orienting, Executive Control, and Alerting
+    float orienting = meanReactionTimeCentralCue - meanReactionTimeSpatialCue;
+    float executiveControl = meanReactionTimeIncongruent - meanReactionTimeCongruent;
+    float alerting = meanReactionTimeNoCue - meanReactionTimeDoubleCue;
+    // Update the TextMesh Pro UI elements with the results
+        orientingText.text = $"Orienting: {orienting} ms";
+        executiveControlText.text = $"Executive Control: {executiveControl} ms";
+        alertingText.text = $"Alerting: {alerting} ms";
+
+
+
+    // Use Debug.Log to display results
+    // Debug.Log($"Orienting: {orienting} ms");
+    // Debug.Log($"Executive Control: {executiveControl} ms");
+    // Debug.Log($"Alerting: {alerting} ms");
+
+    // // Optionally display other results like mean reaction times
+    // Debug.Log($"Mean Reaction Time (Central Cue): {meanReactionTimeCentralCue} ms");
+    // Debug.Log($"Mean Reaction Time (Spatial Cue): {meanReactionTimeSpatialCue} ms");
+    // Debug.Log($"Mean Reaction Time (Incongruent): {meanReactionTimeIncongruent} ms");
+    // Debug.Log($"Mean Reaction Time (Congruent): {meanReactionTimeCongruent} ms");
+    // Debug.Log($"Mean Reaction Time (No Cue): {meanReactionTimeNoCue} ms");
+    // Debug.Log($"Mean Reaction Time (Double Cue): {meanReactionTimeDoubleCue} ms");
+}
+
+private float CalculateMeanReactionTimecongruencyState(string congruencyState)
+{
+    // Filter the trials based on the congruencyState
+    var filteredTrials = trialDataList.Where(t => t.congruencyState.ToLower()==congruencyState.ToLower()).ToList();
+
+    // If there are no trials for the given congruencyState, return 0
+    if (filteredTrials.Count == 0)
+        return 0.0f;
+
+    // Return the average of the response times for the filtered trials
+    return filteredTrials.Average(t => t.responseTime);
+}
+
+private float CalculateMeanReactionTimecueType(string cueType)
+{
+    // Filter trials based on the cue type
+    var filteredTrials = trialDataList.Where(t => t.cueType.ToLower() == cueType.ToLower()).ToList();
+
+    // If no trials match, return 0
+    if (filteredTrials.Count == 0)
+        return 0.0f;
+
+    // Calculate and return the average response time
+    return filteredTrials.Average(t => t.responseTime);
+}
+
+
+
+
+
 
     // Function to play the correct or wrong sound
     void PlayAnswerSound(bool correct)
@@ -520,6 +697,12 @@ void CreateSurroundingArrows(string state, string location)
         yield return new WaitForSeconds(delay);
         ClearFeedback();
     }
+
+
+
+
+
+
 }
 [System.Serializable]
 public class TrialData

@@ -88,41 +88,57 @@ public class NumberPresentation : MonoBehaviour
     }
 
     private void Update()
+{
+    if (!taskActive)
+        return;
+
+    elapsedTime += Time.deltaTime;
+    float remainingTaskTime = Mathf.Max(0, taskDuration - elapsedTime);
+    float nextDigitTimeRemaining = Mathf.Max(0, nextDisplayTime - Time.time);
+
+    taskTimerDisplay.text = $"Time Remaining: {remainingTaskTime:F0}s";
+    nextDigitTimerDisplay.text = $"Next In: {nextDigitTimeRemaining:F0}s";
+    TotalDigit.text = $"TotalDigit: {totalDigitsShown:F0}";
+
+    // Update the level display UI
+    levelDisplay.text = $"Level: {currentLevel}";
+
+    if (elapsedTime >= taskDuration)
     {
-        if (!taskActive)
-            return;
+        EndTask();
+        return;
+    }
 
-        elapsedTime += Time.deltaTime;
-        float remainingTaskTime = Mathf.Max(0, taskDuration - elapsedTime);
-        float nextDigitTimeRemaining = Mathf.Max(0, nextDisplayTime - Time.time);
-
-        taskTimerDisplay.text = $"Time Remaining: {remainingTaskTime:F0}s";
-        nextDigitTimerDisplay.text = $"Next In: {nextDigitTimeRemaining:F0}s";
-        TotalDigit.text = $"TotalDigit: {totalDigitsShown:F0}";
-
-        // Update the level display UI
-        levelDisplay.text = $"Level: {currentLevel}";
-
-        if (elapsedTime >= taskDuration)
+    if (Time.time >= nextDisplayTime)
+    {
+        // If the user didn't respond and the last displayed number was the target number
+        if (responseExpected && !hasResponded)
         {
-            EndTask();
-            return;
-        }
-
-        if (Time.time >= nextDisplayTime)
-        {
-            if (responseExpected && !hasResponded)
-            {
+            Debug.Log("lastDisplayedNumber:"+lastDisplayedNumber);
+            
                 omissionErrorCount++;
                 PlaySound(commissionErrorSound);
+                Debug.Log("Erorr");
+            
+        }
+        if(!responseExpected&& !hasResponded){
+            if (lastDisplayedNumber == targetNumber)
+            {
+                correctResponseCount++;
+                PlaySound(correctResponseSound);
+                Debug.Log("ok");
+                
+                
             }
-
-            ShowNextDigit();
-            nextDisplayTime = Time.time + currentInterval;
         }
 
-        UpdateDifficulty();
+        ShowNextDigit();
+        nextDisplayTime = Time.time + currentInterval;
     }
+
+    UpdateDifficulty();
+}
+
 
     public void OnStartButtonClicked()
     {

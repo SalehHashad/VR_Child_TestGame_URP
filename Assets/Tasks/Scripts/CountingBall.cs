@@ -33,9 +33,13 @@ public class CountingBall : MonoBehaviour
     private int consecutiveCorrect = 0;
     private int correctCount = 0;
     private float displayTime;
+    private int errorCount = 0; 
 
+
+    public int maxTotalErrors = 4;
     public int questionPerLevel = 20;
     public GameObject keyboard;
+    public Transform spawnPoint;
 
     void Start()
     {
@@ -86,19 +90,19 @@ public class CountingBall : MonoBehaviour
         switch (level)
         {
             case 1:
-                displayTime = 5f;
-                break;
-            case 2:
-                displayTime = 4f;
-                break;
-            case 3:
-                displayTime = 3f;
-                break;
-            case 4:
                 displayTime = 2f;
                 break;
-            case 5:
+            case 2:
+                displayTime = 1.5f;
+                break;
+            case 3:
                 displayTime = 1f;
+                break;
+            case 4:
+                displayTime = 0.5f;
+                break;
+            case 5:
+                displayTime = 0.25f;
                 break;
         }
         questionsRemaining = questionPerLevel;
@@ -129,7 +133,8 @@ public class CountingBall : MonoBehaviour
                 break;
         }
 
-        Vector3 forwardPosition = Camera.main.transform.position + Camera.main.transform.forward * forwardOffset;
+         Vector3 forwardPosition = spawnPoint.position + spawnPoint.forward * forwardOffset;
+
 
         for (int i = 0; i < correctCount; i++)
         {
@@ -165,29 +170,45 @@ public class CountingBall : MonoBehaviour
         submitButton.interactable = false;
     }
 
-    void CheckAnswer(int userAnswer)
-    {
-        if (userAnswer == correctCount)
-        {
-            score += 1;
-            consecutiveCorrect++;
-            // if (consecutiveCorrect > 1)
-            // {
-            //     score += 1;
-            // }
-            instructionText.text = "Correct!";
-            audioSource.clip = correctSound;  // Set correct sound clip
-        }
-        else
-        {
-            consecutiveCorrect = 0;
-            instructionText.text = "Incorrect. Try again!";
-            audioSource.clip = wrongSound;    // Set wrong sound clip
-        }
+    
 
-        audioSource.Play(); // Play the selected sound
-        UpdateScoreText();
+void CheckAnswer(int userAnswer)
+{
+    if (userAnswer == correctCount)
+    {
+        score += 1;
+        consecutiveCorrect++;
+        instructionText.text = "Correct!";
+        audioSource.clip = correctSound;  // Set correct sound clip
     }
+    else
+    {
+        consecutiveCorrect = 0;
+        errorCount++; // Increment error count
+        instructionText.text = "Incorrect. Try again!";
+        audioSource.clip = wrongSound;    // Set wrong sound clip
+        
+        // Check if errors have reached 4
+        if (errorCount >= maxTotalErrors)
+        {
+            EndTask(); // Call the method to end the task
+            return;    // Stop further processing
+        }
+    }
+
+    audioSource.Play(); // Play the selected sound
+    UpdateScoreText();
+}
+
+void EndTask()
+{
+    StopAllCoroutines(); // Stop all coroutines to end the task
+    instructionText.text = "Task ended due to too many errors.";
+    submitButton.interactable = false;
+    ShowKeyboard(false); // Hide the keyboard
+    ClearBalls();        // Clear the balls
+}
+
 
     void UpdateScoreText()
     {

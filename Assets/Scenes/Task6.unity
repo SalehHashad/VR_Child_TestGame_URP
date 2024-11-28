@@ -703,7 +703,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 25103267}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1fd98fdcc5a5d2342a56e38b6c5dd52d, type: 3}
   m_Name: 
@@ -11223,6 +11223,37 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 3685361913716607004, guid: fd471f3f3bc099046af6a6acaf09ee44, type: 3}
   m_PrefabInstance: {fileID: 681849679}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &687271622
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 687271623}
+  m_Layer: 0
+  m_Name: spawn
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &687271623
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 687271622}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 4}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &698244240 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5564213593126473377, guid: 9625218cc13e94db5ba3a430df8a7a13, type: 3}
@@ -24604,6 +24635,10 @@ PrefabInstance:
       value: 0.8627451
       objectReference: {fileID: 0}
     - target: {fileID: 8270575375683674030, guid: 08e1f54a131a15141b5632398abcee0d, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8270575375683674030, guid: 08e1f54a131a15141b5632398abcee0d, type: 3}
       propertyPath: _childScale
       value: 3
       objectReference: {fileID: 0}
@@ -28971,9 +29006,11 @@ MonoBehaviour:
   maxY: 4
   minZ: 5
   maxZ: 20
-  forwardOffset: 2
+  forwardOffset: 5
+  maxTotalErrors: 4
   questionPerLevel: 20
   keyboard: {fileID: 762645387}
+  spawnPoint: {fileID: 687271623}
 --- !u!1001 &1714741047
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -30882,6 +30919,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5900918677935655234, guid: 7cf414ba16c13f543a238a97b8ba136f, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5900918677935655235, guid: 7cf414ba16c13f543a238a97b8ba136f, type: 3}
+      propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5900918677935655235, guid: 7cf414ba16c13f543a238a97b8ba136f, type: 3}
@@ -42532,3 +42573,4 @@ SceneRoots:
   - {fileID: 1251700884}
   - {fileID: 1268251964}
   - {fileID: 8691194295398809215}
+  - {fileID: 687271623}

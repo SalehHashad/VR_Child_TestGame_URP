@@ -530,7 +530,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 25103267}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1fd98fdcc5a5d2342a56e38b6c5dd52d, type: 3}
   m_Name: 
@@ -23645,6 +23645,10 @@ PrefabInstance:
       value: 0.8627451
       objectReference: {fileID: 0}
     - target: {fileID: 8270575375683674030, guid: 08e1f54a131a15141b5632398abcee0d, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8270575375683674030, guid: 08e1f54a131a15141b5632398abcee0d, type: 3}
       propertyPath: _childScale
       value: 3
       objectReference: {fileID: 0}
@@ -29130,6 +29134,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5900918677935655234, guid: 7cf414ba16c13f543a238a97b8ba136f, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5900918677935655235, guid: 7cf414ba16c13f543a238a97b8ba136f, type: 3}
+      propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5900918677935655235, guid: 7cf414ba16c13f543a238a97b8ba136f, type: 3}

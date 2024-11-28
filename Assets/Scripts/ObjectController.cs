@@ -1,10 +1,12 @@
 using UnityEngine;
-using UnityEngine.UI; // For UI Image component
-using TMPro; // For TextMeshPro
-
+using UnityEngine.UI; 
+using TMPro; 
+using System.Collections; 
 public class ObjectController : MonoBehaviour
 {
-    public GameObject[] objects = new GameObject[4];
+    public GameObject objectPrefab; // Prefab to spawn
+    public Transform spawnPoint; // Parent object with GridLayoutGroup
+    public GameObject buttonPrefab; // Prefab for the buttons
     public GameObject taskObjects;
     public GameObject QuestionObject;
 
@@ -13,145 +15,177 @@ public class ObjectController : MonoBehaviour
 
     private GameObject rotatingObject;
     private GameObject[] transparentObjects = new GameObject[3];
+    private GameObject[] spawnedObjects = new GameObject[4]; // Array to hold spawned objects
 
     private bool hasRotated = false;
     private int score = 0;
     private int Question = 1;
     public int QuestionPerLevel = 50;
+    public float appearSeconds = 50;
 
     public TextMeshProUGUI scoreText;
     public TextMeshProUGUI QuestionText;
     public TextMeshProUGUI instructionText; // Instruction text for each step
 
-    void Start()
+    private GameObject[] buttons = new GameObject[4]; // Array to hold button references
+    private GameObject targetObject; // The target object to find in the buttons
+
+    // Add two buttons for vertical and horizontal actions
+    public Button verticalButton;
+    public Button horizontalButton;
+
+    private float targetRotation = 0f; // Track the rotation of the target object (0 or 90)
+[Header("Audio Feedback")]
+    [SerializeField] private AudioClip correctSound;
+    [SerializeField] private AudioClip incorrectSound;
+    private AudioSource audioSource;
+
+    // Countdown timer before starting the task
+    IEnumerator CountdownBeforeStart()
     {
-        StartQuestion();
-    }
-
-  void StartQuestion()
-{
-    // Reset the rotation of all objects to the default orientation
-    foreach (GameObject obj in objects)
-    {
-        obj.transform.rotation = Quaternion.identity; // Resets rotation to (0,0,0)
-    }
-
-    // Reset transparency of all objects to 1 (fully opaque)
-    foreach (GameObject obj in objects)
-    {
-        SetChildImageTransparency(obj, 1f);
-    }
-
-    // Display the question and score
-    QuestionText.text = "Question: " + Question + "/" + QuestionPerLevel;
-    scoreText.text = "Score: " + score;
-
-    // Set the initial instruction
-    instructionText.text = "Choose the Clear Image";
-
-    // Randomly select one object to be the rotating object
-    int rotatingIndex = Random.Range(0, objects.Length);
-    rotatingObject = objects[rotatingIndex];
-    Debug.Log("Selected rotating object index: " + rotatingIndex + ", Object name: " + rotatingObject.name);
-
-    // Randomize the initial rotation of the rotating object (0 or 90 degrees)
-    float randomRotationAngle = Random.value < 0.5f ? 0f : 90f;
-    rotatingObject.transform.Rotate(rotationAxis * randomRotationAngle, Space.Self);
-    Debug.Log("Rotating object random rotation angle: " + randomRotationAngle);
-
-    // Populate the transparentObjects array with the other objects
-    transparentObjects = new GameObject[3];
-    int transparentIndex = 0;
-    for (int i = 0; i < objects.Length; i++)
-    {
-        if (i != rotatingIndex)
+        instructionText.text = "Task starting in 5 seconds...";
+        
+        for (int i = 0; i < 5; i++)
         {
-            transparentObjects[transparentIndex] = objects[i];
-            transparentIndex++;
+            instructionText.text = $"Task starting in {5-i} seconds...";
+            yield return new WaitForSeconds(1);  // Wait for 1 seconds
         }
+        
+        
+        instructionText.text = "Task Started!";
+
+        // Start the game after countdown
+        StartNewLevel();
     }
 
-    // Apply transparency to the transparent objects
-    foreach (GameObject obj in transparentObjects)
+    void PlaySound(AudioClip clip)
     {
-        if (obj != null)
+        audioSource.clip = clip;
+        audioSource.Play();
+    }
+    void StartNewLevel()
+    {
+        
+        
+
+        // Spawn objects and start the game
+        SpawnObjects();
+
+        
+    }
+
+    void Start(){
+        audioSource = gameObject.AddComponent<AudioSource>();
+        // Add listeners to the vertical and horizontal buttons
+        verticalButton.onClick.AddListener(VerticalButtonClicked);
+        horizontalButton.onClick.AddListener(HorizontalButtonClicked);
+        scoreText.text = "Score: " + score;
+        // Initialize the first question
+        Question = 1;  // Reset question to 1
+        QuestionText.text = "Question: " + Question + "/" + QuestionPerLevel; // Update the question text
+        StartCoroutine(CountdownBeforeStart());
+    }
+
+    void SpawnObjects()
+    {
+        // Destroy old buttons from previous round
+        foreach (GameObject button in buttons)
         {
-            SetChildImageTransparency(obj, transparencyValue);
+            if (button != null) Destroy(button);
         }
-        else
+
+        foreach (GameObject obj in spawnedObjects)
         {
-            Debug.LogWarning("Encountered a null object in transparentObjects array.");
+            if (obj != null) Destroy(obj);
         }
-    }
 
-    // Reset rotation state for the new rotating object
-    hasRotated = false;
-}
-
-void Update()
-{
-    // Ensure the rotating object only rotates once, if it hasn't already been rotated
-    if (!hasRotated && rotatingObject != null)
-    {
-        rotatingObject.transform.Rotate(rotationAxis * 90f, Space.Self);
-        hasRotated = true;
-    }
-}
-
-
-    void SetChildImageTransparency(GameObject parentObj, float alphaValue)
-    {
-        if (parentObj != null)
+        // Spawn objects in the parent object with GridLayoutGroup
+        for (int i = 0; i < spawnedObjects.Length; i++)
         {
-            Image image = parentObj.GetComponentInChildren<Image>();
-            if (image != null)
-            {
-                Color color = image.color;
-                color.a = Mathf.Clamp01(alphaValue);
-                image.color = color;
-            }
+            GameObject spawnedObject = Instantiate(objectPrefab, spawnPoint);
+            spawnedObject.name = "Object " + i; // Set the name to "Object [index]"
+            spawnedObjects[i] = spawnedObject; // Store reference to the spawned object
+            targetRotation = Random.Range(0, 2) * 90f; // Randomly set 0 or 90 degrees
+            targetObject = spawnedObjects[i];
+            targetObject.transform.rotation = Quaternion.Euler(rotationAxis * targetRotation); // Apply the rotation
+            // Apply transparency to all objects
+            SetObjectTransparency(spawnedObject, transparencyValue);
         }
+
+        // Randomly select the target object and set it to have full transparency
+        int targetIndex = Random.Range(0, spawnedObjects.Length);
+        targetObject = spawnedObjects[targetIndex];
+        SetObjectTransparency(targetObject, 1f); // Full opacity for the target object
+
+        // Randomly rotate the target object to either 0 or 90 degrees
+        targetRotation = Random.Range(0, 2) * 90f; // Randomly set 0 or 90 degrees
+        targetObject.transform.rotation = Quaternion.Euler(rotationAxis * targetRotation); // Apply the rotation
+
+        // Show the spawned objects for 1 second, then hide them
+        StartCoroutine(DisplayObjectsForSeconds(appearSeconds));
     }
 
-    public bool CheckTransparency(GameObject obj)
+    System.Collections.IEnumerator DisplayObjectsForSeconds(float seconds)
     {
-        Image image = obj.GetComponentInChildren<Image>();
-        return image != null && Mathf.Approximately(image.color.a, 1);
-    }
+        // Show objects for a set duration
+        yield return new WaitForSeconds(seconds);
 
-    public bool CheckRotation(GameObject obj)
-    {
-        float rotationZ = obj.transform.rotation.eulerAngles.z;
-        return rotationZ == 90f;
-    }
-
-    public void OnVerButtonClick()
-    {
-        if (!CheckRotation(rotatingObject))
+        // Hide the spawned objects after 1 second
+        foreach (GameObject obj in spawnedObjects)
         {
-            Debug.Log("OnVerButtonClick");
+            obj.SetActive(false);
+        }
+
+        // Show buttons after the objects are hidden
+        ShowButtons();
+    }
+
+    void ShowButtons()
+    {
+        // Destroy old buttons from previous round
+        foreach (GameObject button in buttons)
+        {
+            if (button != null) Destroy(button);
+        }
+
+        // Instantiate the buttons and place them under the UI canvas (or parent object)
+        for (int i = 0; i < buttons.Length; i++)
+        {
+            GameObject button = Instantiate(buttonPrefab, taskObjects.transform);
+            buttons[i] = button; // Store the button reference
+
+            // Assign the correct button label
+            TextMeshProUGUI buttonText = button.GetComponentInChildren<TextMeshProUGUI>();
+            buttonText.text = "Here";
+
+            // Assign button click listeners
+            int index = i; // Capture index to avoid closure issue in the loop
+            button.GetComponent<Button>().onClick.AddListener(() => OnButtonClick(index));
+        }
+
+        instructionText.text = "Click the button representing the target object!";
+    }
+
+    void OnButtonClick(int buttonIndex)
+    {
+        if (spawnedObjects[buttonIndex] == targetObject)
+        {
+            // Correct button clicked, increase score
             IncreaseScore();
-            instructionText.text = "Correct! The object was rotated vertically. Proceed to the next question.";
-        }
-        else
-        {
-            instructionText.text = "Incorrect. The object was not rotated vertically. Proceed to the next question.";
-        }
-        FlipPhaseBack();
-    }
+            instructionText.text = "Correct!";
+            PlaySound(correctSound);
 
-    public void OnHorButtonClick()
-    {
-        if (CheckRotation(rotatingObject))
-        {
-            IncreaseScore();
-            instructionText.text = "Correct! The object was rotated horizontally. Proceed to the next question.";
+            // Deactivate task objects and activate QuestionObject
+            taskObjects.SetActive(false);
+            QuestionObject.SetActive(true);
         }
         else
         {
-            instructionText.text = "Incorrect. The object was not rotated horizontally. Proceed to the next question.";
+            // Incorrect button clicked
+            instructionText.text = "Incorrect! Try again.";
+            PlaySound(incorrectSound);
+            ResetForNextRound();
         }
-        FlipPhaseBack();
     }
 
     public void IncreaseScore()
@@ -160,20 +194,75 @@ void Update()
         scoreText.text = "Score: " + score;
     }
 
-    public void FlipPhase()
-    {
-        taskObjects.SetActive(false);
-        QuestionObject.SetActive(true);
-        instructionText.text = "Decide if it is rotated horizontally or vertically";
-    }
-
-    public void FlipPhaseBack()
+    void ResetForNextRound()
     {
         taskObjects.SetActive(true);
         QuestionObject.SetActive(false);
+        // Proceed to the next question
         Question++;
+        if (Question <= QuestionPerLevel)
+        {
+            // Display question number
+            QuestionText.text = "Question: " + Question + "/" + QuestionPerLevel;
 
-        // Restart StartQuestion with a new random rotating object
-        StartQuestion();
+            // Restart the process
+            SpawnObjects();
+        }
+        else
+        {
+            // Game over or complete
+            instructionText.text = "You've completed all questions!";
+        }
+    }
+
+    void SetObjectTransparency(GameObject obj, float alphaValue)
+    {
+        Transform imageChildTransform = obj.transform.Find("Image"); // Replace "image" with the actual child name
+        if (imageChildTransform != null)
+        {
+            Debug.Log("Image found");
+            Image childImage = imageChildTransform.GetComponent<Image>(); // Get Image component from the child
+            if (childImage != null)
+            {
+                Debug.Log("Image Component found");
+                Color color = childImage.color; // Get current color of the child image
+                color.a = alphaValue; // Set the alpha (transparency)
+                childImage.color = color; // Apply the new color to the child image
+            }
+        }
+    }
+
+    void VerticalButtonClicked()
+    {
+        if (targetRotation == 0f)
+        {
+            IncreaseScore(); // Add point if the rotation is 0
+            instructionText.text = "Correct!";
+            PlaySound(correctSound);
+        }
+        else
+        {
+            instructionText.text = "Incorrect! Try again.";
+            PlaySound(incorrectSound);
+        }
+        
+        ResetForNextRound();
+    }
+
+    void HorizontalButtonClicked()
+    {
+        if (targetRotation == 90f)
+        {
+            IncreaseScore(); // Add point if the rotation is 90
+            instructionText.text = "Correct!";
+            PlaySound(correctSound);
+        }
+        else
+        {
+            instructionText.text = "Incorrect! Try again.";
+            PlaySound(incorrectSound);
+        }
+        
+        ResetForNextRound();
     }
 }

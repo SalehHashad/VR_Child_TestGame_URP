@@ -5,12 +5,16 @@ using System.Collections.Generic;
 
 public class VisualAttentionTask : MonoBehaviour
 {
+    
+    public GameObject resultUI; // Assign sphere prefab in the inspector
+    public GameObject taskUI; // Assign sphere prefab in the inspector
     public GameObject spherePrefab; // Assign sphere prefab in the inspector
      public GameObject redBallPrefab; // Assign red ball prefab in the inspector
     public Transform spawnPoint; // Point where spheres will spawn
     public int startingObjects = 4; // Initial number of objects
     public float speed = 3f; // Speed of object movement
     public int level = 1; // Current level
+    public int totalwrongError = -10; // Current level
     public int QuestionPerLevel = 20; // Current level
     public float roundTime = 10f; // Timer duration for each round
 
@@ -24,7 +28,7 @@ public class VisualAttentionTask : MonoBehaviour
     private float currentTime;
     private bool roundActive = true;
     private int score = 0;
-    private int Question = 1;
+    private int Question = 0;
 
     private int correctTrackingStreak = 0; // To track consecutive correct answers
     private int correctRedObjectsCount = 0; // Count of correctly tracked red objects
@@ -41,14 +45,29 @@ public int maxconsecutiveWrong = 4;
         StartLevel(level);
         
     }
+    public void SetLevelAndStartTask(int lvl)
+    {
+        // currentLevel = level-1; // Set the selected level
+        // Debug.Log("Current Level: " + currentLevel); // Debugging purpose
+        level=lvl;
+  score=0;
+  UpdateUI();
+        // Call StartClick to begin the task
+        StartLevel(lvl);
+    }
 
     void StartLevel(int level)
     {
+         instructionsText.text = " ";
         roundActive=true;
-       SetLevelParameters(level);
-       currentTime = roundTime;
-    boundary.SetActive(true);
-        
+        SetLevelParameters(level);
+        currentTime = roundTime;
+        UpdateUI();
+        taskUI.SetActive(true);
+        resultUI.SetActive(false);
+        boundary.SetActive(true);
+      
+       UpdateUI();
         ClearObjects();
         
         SpawnObjects();
@@ -57,6 +76,7 @@ public int maxconsecutiveWrong = 4;
 
     void Update()
     {
+        UpdateUI();
         if (roundActive)
         {
             currentTime -= Time.deltaTime;
@@ -127,12 +147,16 @@ private IEnumerator RevertColorCoroutine(GameObject ball, float delay)
 {
     yield return new WaitForSeconds(delay);
 
-    Renderer renderer = ball.GetComponent<Renderer>();
-    if (renderer != null)
+    if (ball != null) // Check if the GameObject still exists
     {
-        renderer.material.color = Color.white; // Change back to default color
+        Renderer renderer = ball.GetComponent<Renderer>();
+        if (renderer != null)
+        {
+            renderer.material.color = Color.white; // Change back to default color
+        }
     }
 }
+
 
     void EndRound()
     {
@@ -176,67 +200,86 @@ private IEnumerator RevertColorCoroutine(GameObject ball, float delay)
         instructionsText.text = "Congratulations! Level Up!";
     }
     void UpdateUI()
+{
+    levelText.text = $"Level: {level}";
+    scoreText.text = $"Score: {score}";
+    questionText.text = $"Question: {Question+1}/{QuestionPerLevel}";
+    timerText.text = $"Time: {Mathf.Ceil(currentTime)}";
+
+    if (Question >= QuestionPerLevel)
     {
-        
-        levelText.text = "Level: " + level;
-        scoreText.text = "Score: " + score;
-        questionText.text = "Question: "+ Question+"/"+QuestionPerLevel; // Placeholder, update as needed
-        if(Question==QuestionPerLevel)
-        {
-            LevelUp();
-        }
-        instructionsText.text = "Track the red objects and remember their positions!";
+        LevelUp();
     }
+}
+
 
     // Function to handle ball clicks
     public void OnBallClicked(bool isRed)
+{
+    if (isRed)
     {
-        if (isRed)
-        {
-            // Correctly identified red object
-            correctRedObjectsCount++;
-            score += 1; // Earn 1 point for correctly identified red object
-            instructionsText.text = "Correct! You clicked a red ball.";
-        }
-        else
-        {
-            // Incorrectly identified object
-            score -= 1; // Deduct 1 point for an incorrect identification
-            instructionsText.text = "Oops! That wasn't a red ball.";
-        }
- CheckRoundTracking();
-    
-
-        // Update the score UI
-        UpdateUI();
+        correctRedObjectsCount++;
+        score += 1; // Increment score
+        instructionsText.text = "Correct! You clicked a red ball.";
     }
+    else
+    {
+        score -= 1; // Decrement score
+        instructionsText.text = "Oops! That wasn't a red ball.";
+    }
+
+    // Check if the task should end due to low score
+    if (score <= totalwrongError)
+    {
+        scoreText.text = $"Score: {score}";
+        StartCoroutine(EndTask());
+        return;
+    }
+
+    CheckRoundTracking();
+    UpdateUI();
+}
+
+
+private IEnumerator EndTask()
+{
+    roundActive = false;
+    ClearObjects();
+    instructionsText.text = $"Game Over! Your score dropped to {totalwrongError}.";
+     yield return new WaitForSeconds(2);
+    resultUI.SetActive(true);
+    taskUI.SetActive(false);
+    
+    // Optionally disable further interactions or reset the game
+}
+
 
     // Call this method when the round ends to check if the player tracked all red objects correctly
     public void CheckRoundTracking()
-    {
-        if (correctRedObjectsCount == totalRedObjects)
-        {
-            correctTrackingStreak++;
-            Question+=1;
-            // score += correctTrackingStreak; // Bonus for consecutive correct trackings
-            instructionsText.text = "Correct tracking! Streak: " + correctTrackingStreak;
-            StartLevel(level);
-            consecutiveWrong=0;
-        }
-        else
-        {
-           consecutiveWrong++;
-            correctTrackingStreak=0;
-            instructionsText.text = "You missed some red objects.";
-        }
-        if(consecutiveWrong==maxconsecutiveWrong)
 {
-    Question+=1;
-            // score += correctTrackingStreak; // Bonus for consecutive correct trackings
-            instructionsText.text = $"You missed {consecutiveWrong} times";
-            StartLevel(level);
-}
+    if (correctRedObjectsCount == totalRedObjects)
+    {
+        correctTrackingStreak++;
+        consecutiveWrong = 0; // Reset wrong attempts
+        Question++;
+        instructionsText.text = $"Great job! Streak: {correctTrackingStreak}";
+        StartLevel(level);
     }
+    else
+    {
+        consecutiveWrong++;
+        correctTrackingStreak = 0;
+        
+
+        if (consecutiveWrong >= maxconsecutiveWrong)
+        {
+            instructionsText.text = $"Too many misses ({consecutiveWrong}/{maxconsecutiveWrong}). Resetting level.";
+            consecutiveWrong=0;
+            StartLevel(level);
+        }
+    }
+}
+
 }
 
 public class RandomMovement : MonoBehaviour
