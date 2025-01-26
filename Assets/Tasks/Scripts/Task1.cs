@@ -13,13 +13,13 @@ public class Task1 : MonoBehaviour
     public TMP_Text levelText; // Displays the current level
     public TMP_Text questionCounterText; // Displays the current question
     public TMP_Text feedbackText; // Displays feedback (e.g., "Correct", "Wrong")
-public TextMeshProUGUI orientingText;
+    public TextMeshProUGUI orientingText;
     public TextMeshProUGUI executiveControlText;
     public TextMeshProUGUI alertingText;
     // Level Prefabs
     public List<GameObject> arrowPrefabs; // Assign prefabs for each level in the Inspector
-private List<GameObject> spawnedArrows = new List<GameObject>();
-private List<TrialData> trialDataList = new List<TrialData>();
+    private List<GameObject> spawnedArrows = new List<GameObject>();
+    private List<TrialData> trialDataList = new List<TrialData>();
 
     // Buttons
     public GameObject rightButton; // Button for the "Right" answer
