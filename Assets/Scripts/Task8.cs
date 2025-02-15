@@ -56,7 +56,13 @@ public class Task8 : MonoBehaviour
         if (isTaskEnd) return; // Don't set up a new task if the task is already ended
 
         maxRange = GetMaxRangeForLevel(level);
-        number = Random.Range(0, maxRange + 1);
+        // number = Random.Range(0, maxRange + 1);
+        int restrictedValue = Mathf.CeilToInt(maxRange / 2f);
+        do
+        {
+            number = Random.Range(0, maxRange + 1);
+        } 
+        while (number == restrictedValue);
         questionCount++;
 
         // Randomly choose between the odd/even or greater/less task

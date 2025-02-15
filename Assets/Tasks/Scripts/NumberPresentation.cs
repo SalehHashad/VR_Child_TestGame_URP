@@ -117,7 +117,9 @@ public class NumberPresentation : MonoBehaviour
             Debug.Log("lastDisplayedNumber:"+lastDisplayedNumber);
             
                 omissionErrorCount++;
+                ChangeNumberColor(Color.red);
                 PlaySound(commissionErrorSound);
+                
                 Debug.Log("Erorr");
             
         }
@@ -126,6 +128,7 @@ public class NumberPresentation : MonoBehaviour
             {
                 correctResponseCount++;
                 PlaySound(correctResponseSound);
+                ChangeNumberColor(Color.green);
                 Debug.Log("ok");
                 
                 
@@ -176,6 +179,7 @@ public class NumberPresentation : MonoBehaviour
         } while (randomDigit == lastDisplayedNumber);
 
         digitDisplay.text = randomDigit.ToString();
+        ChangeNumberColor(Color.black);
         totalDigitsShown++;
         lastDisplayedNumber = randomDigit;
         responseExpected = randomDigit != targetNumber;
@@ -222,19 +226,29 @@ public class NumberPresentation : MonoBehaviour
             if (currentDigit == targetNumber)
             {
                 commissionErrorCount++;
+                ChangeNumberColor(Color.red);
                 PlaySound(commissionErrorSound);
+                
+                
             }
             else
             {
                 correctResponseCount++;
                 correctResponseTimes.Add(responseTime);
                 PlaySound(correctResponseSound);
+                ChangeNumberColor(Color.green);
             }
 
             hasResponded = true;
         }
     }
-
+private void ChangeNumberColor(Color color)
+    {
+        if (digitDisplay != null)
+        {
+            digitDisplay.color = color;
+        }
+    }
     private float CalculateAverageResponseTime()
     {
         float sum = 0.0f;

@@ -17065,6 +17065,8 @@ MonoBehaviour:
   instructionAudio: {fileID: 988305241}
   arabicClip: {fileID: 8300000, guid: 7adf3c368fa945846b9935ce1ad94d56, type: 3}
   englishClip: {fileID: 8300000, guid: e455ed8a50743ca48baf6df5103beaee, type: 3}
+  englishInstruction: []
+  arabicInstruction: []
 --- !u!4 &988305243
 Transform:
   m_ObjectHideFlags: 0
@@ -18737,7 +18739,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6598815579406187037, guid: 18ddb545287c546e19cc77dc9fbb2189, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

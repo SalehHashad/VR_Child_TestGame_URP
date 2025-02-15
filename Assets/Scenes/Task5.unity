@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.61336035, g: 0.48126578, b: 0.4730206, a: 1}
+  m_IndirectSpecularColor: {r: 0.61336035, g: 0.48126578, b: 0.4730205, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -20589,6 +20589,8 @@ MonoBehaviour:
   instructionAudio: {fileID: 1014824243}
   arabicClip: {fileID: 8300000, guid: 93722d8da706c12469d719e05591d38e, type: 3}
   englishClip: {fileID: 8300000, guid: 3db8ce2706bffa74d8b21f36aa3139e2, type: 3}
+  englishInstruction: []
+  arabicInstruction: []
 --- !u!4 &1014824245
 Transform:
   m_ObjectHideFlags: 0
@@ -21957,7 +21959,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6598815579406187037, guid: 18ddb545287c546e19cc77dc9fbb2189, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

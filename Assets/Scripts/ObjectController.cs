@@ -22,6 +22,7 @@ public class ObjectController : MonoBehaviour
     private int Question = 1;
     public int QuestionPerLevel = 50;
     public float appearSeconds = 50;
+    public float timeBetwenQ = 1f;
 
     public TextMeshProUGUI scoreText;
     public TextMeshProUGUI QuestionText;
@@ -194,26 +195,37 @@ public class ObjectController : MonoBehaviour
         scoreText.text = "Score: " + score;
     }
 
-    void ResetForNextRound()
+    IEnumerator ResetForNextRoundCoroutine()
+{
+    taskObjects.SetActive(true);
+    QuestionObject.SetActive(false);
+    
+    // Proceed to the next question
+    Question++;
+    if (Question <= QuestionPerLevel)
     {
-        taskObjects.SetActive(true);
-        QuestionObject.SetActive(false);
-        // Proceed to the next question
-        Question++;
-        if (Question <= QuestionPerLevel)
-        {
-            // Display question number
-            QuestionText.text = "Question: " + Question + "/" + QuestionPerLevel;
+        // instructionText.text = "Next question in 3 seconds...";
+        yield return new WaitForSeconds(timeBetwenQ); // Wait before starting the next question
 
-            // Restart the process
-            SpawnObjects();
-        }
-        else
-        {
-            // Game over or complete
-            instructionText.text = "You've completed all questions!";
-        }
+        // Display question number
+        QuestionText.text = "Question: " + Question + "/" + QuestionPerLevel;
+
+        // Restart the process
+        SpawnObjects();
     }
+    else
+    {
+        // Game over or complete
+        instructionText.text = "You've completed all questions!";
+    }
+}
+
+// Call this method instead of directly resetting
+void ResetForNextRound()
+{
+    StartCoroutine(ResetForNextRoundCoroutine());
+}
+
 
     void SetObjectTransparency(GameObject obj, float alphaValue)
     {

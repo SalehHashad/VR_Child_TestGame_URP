@@ -24,10 +24,13 @@ public class DigitMemoryGame : MonoBehaviour
     [SerializeField] private GameObject resultsPanel; // Panel UI
     [SerializeField] private GameObject TaskUI; // Panel UI
     [SerializeField] private GameObject OnboardingUI; // Panel UI
-    // [SerializeField] private GameObject Keyboard; // Panel UI
+    [SerializeField] private GameObject Keyboard; // Panel UI
 
     [Header("Game Settings")]
     [SerializeField] private int SequencePerLevel=20; // Panel UI
+    [SerializeField] private float timeBetwenLvl=3; // Panel UI
+    [SerializeField] private float timeBetwenQ=1; // Panel UI
+    [SerializeField] private float timeBetwenDigit=2; // Panel UI
 
     [Header("Audio Feedback")]
     [SerializeField] private AudioClip correctSound;
@@ -56,8 +59,11 @@ public class DigitMemoryGame : MonoBehaviour
         submitButton.onClick.AddListener(CheckUserResponse);
         
         resultsPanel.SetActive(false); // Hide results panel at the start
-        TaskUI.SetActive(false);
-        OnboardingUI.SetActive(true);
+        TaskUI.SetActive(true);
+
+        ///====code modified here ===..//
+        // OnboardingUI.SetActive(true);
+    // StartClick();
     }
     public void SetLevelAndStartTask(int level)
     {
@@ -75,6 +81,7 @@ public class DigitMemoryGame : MonoBehaviour
         OnboardingUI.SetActive(false);  // Deactivate Onboarding UI
         resultsPanel.SetActive(false);  // Deactivate Onboarding UI
         TaskUI.SetActive(true);  // Activate Task UI
+        Keyboard.SetActive(true);  // Activate Task UI
         StartCoroutine(CountdownBeforeStart());
     }
 
@@ -202,7 +209,7 @@ public class DigitMemoryGame : MonoBehaviour
             
             displayText.text = digit.ToString();
             answerInput.text = "";
-            yield return new WaitForSeconds(1);
+            yield return new WaitForSeconds(timeBetwenDigit);
         }
 
         displayText.text = "";
@@ -287,12 +294,14 @@ public class DigitMemoryGame : MonoBehaviour
                 EndGame();
                 return;
             }
-            StartNewLevel();
+            // StartNewLevel();
+             StartCoroutine(WaitAndStartNewLevel());
         }
         else
         {
             currentAttempt = 0;
-            GenerateNewSequence();
+            // GenerateNewSequence();
+            StartCoroutine(WaitAndGenerateNewSequence());
         }
     }
 
@@ -332,16 +341,38 @@ public class DigitMemoryGame : MonoBehaviour
                     EndGame();
                     return;
                 }
-                StartNewLevel();
+                // StartNewLevel();
+                 StartCoroutine(WaitAndStartNewLevel());
             }
             else
             {
-                GenerateNewSequence();
+                // GenerateNewSequence();
+                StartCoroutine(WaitAndGenerateNewSequence());
             }
         }
     }
 }
 
+IEnumerator WaitAndGenerateNewSequence()
+{
+    instructionText.text = $"Next sequence in {timeBetwenQ} seconds...";
+    yield return new WaitForSeconds(timeBetwenQ);  // Wait for 3 seconds
+    GenerateNewSequence();
+}
+
+IEnumerator WaitAndStartNewLevel()
+{
+    instructionText.text = $"Level " + currentLevel + " starting in {timeBetwenLvl} seconds...";
+    yield return new WaitForSeconds(timeBetwenLvl);  // Wait for 3 seconds
+    StartNewLevel();
+}
+
+// IEnumerator WaitAndEnableInput()
+// {
+//     yield return new WaitForSeconds(2); // Wait for 2 seconds before retrying
+//     instructionText.text = (currentLevel == 1) ? "Enter the sequence." : "Enter the sequence in reverse order.";
+//     answerInput.interactable = true; // Enable input field again
+// }
 
     void EndGame()
     {
