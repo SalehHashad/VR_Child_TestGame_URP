@@ -125,15 +125,50 @@ PrefabInstance:
       value: 361.3
       objectReference: {fileID: 0}
     - target: {fileID: 7063831082857938688, guid: e286a73095e698b449bb849921a7ed97, type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: f231565b871020546b70024374bcc5ea, type: 2}
+    - target: {fileID: 7063831082857938688, guid: e286a73095e698b449bb849921a7ed97, type: 3}
       propertyPath: m_fontSizeBase
       value: 361.3
       objectReference: {fileID: 0}
     - target: {fileID: 7063831082857938688, guid: e286a73095e698b449bb849921a7ed97, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: -250492331588533066, guid: f231565b871020546b70024374bcc5ea, type: 2}
+    - target: {fileID: 7063831082857938688, guid: e286a73095e698b449bb849921a7ed97, type: 3}
       propertyPath: m_TextStyleHashCode
       value: -1183493901
+      objectReference: {fileID: 0}
+    - target: {fileID: 7063831082857938688, guid: e286a73095e698b449bb849921a7ed97, type: 3}
+      propertyPath: m_hasFontAssetChanged
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 8416018203218445727, guid: e286a73095e698b449bb849921a7ed97, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5604711139746034524}
   m_SourcePrefab: {fileID: 100100000, guid: e286a73095e698b449bb849921a7ed97, type: 3}
+--- !u!1 &765029236118258579 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8416018203218445727, guid: e286a73095e698b449bb849921a7ed97, type: 3}
+  m_PrefabInstance: {fileID: 9103567043211331084}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &5604711139746034524
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 765029236118258579}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80172e7093d66a24a9c280683dbfd615, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fixedText: 
+  ShowTashkeel: 0
+  UseHinduNumbers: 0

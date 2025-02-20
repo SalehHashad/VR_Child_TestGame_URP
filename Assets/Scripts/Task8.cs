@@ -40,10 +40,50 @@ public class Task8 : MonoBehaviour
     private int consecutiveWrongAnswers = 0;
     public int maxConsecutiveWrong = 4;
 
+    public bool isEnglish = true; // Default to English
+
+    public void SetLanguage()
+    {
+        isEnglish = false;
+         Debug.Log("isEnglish>: " + isEnglish); // Debugging purpose
+         
+    }
+    void AddArabicFixerToAllText()
+{
+    TextMeshProUGUI[] allTextElements = { currentQuestionText, questionText,
+        scoreText,rightButtonText,leftButtonText,levelText,currentNumberText};
+
+    foreach (TextMeshProUGUI textElement in allTextElements)
+    {
+        if (textElement != null)
+        {
+            ArabicFixerTMPRO fixer = textElement.GetComponent<ArabicFixerTMPRO>();
+            if (fixer == null)
+            {
+                textElement.gameObject.AddComponent<ArabicFixerTMPRO>();
+            }
+        }
+    }
+}
+
+    private void SetArabicText(TMP_Text textElement, string newText)
+{
+    if (textElement != null)
+    {
+        ArabicFixerTMPRO arabicFixer = textElement.GetComponent<ArabicFixerTMPRO>();
+        if (arabicFixer != null)
+        {
+            arabicFixer.fixedText = newText;
+        }
+        textElement.text = newText; // Ensure the text updates correctly
+    }
+}
+
     void Start()
     {
         // Get the AudioSource component from the same GameObject
         audioSource = GetComponent<AudioSource>();
+        AddArabicFixerToAllText();
 
         SetupLevel(currentLevel);
         leftButton.onClick.AddListener(() => HandleButtonClick(true));
@@ -69,25 +109,30 @@ public class Task8 : MonoBehaviour
         if (Random.value > 0.5f)
         {
             currentTaskType = TaskType.OddEven;
-            questionText.text = $"Is number odd or even?";
-            currentNumberText.text = $"{number}";
+            SetArabicText(questionText, isEnglish ? "Is number odd or even?" : "هل الرقم فردي أم زوجي؟");
+SetArabicText(currentNumberText, isEnglish ? $"{number}" : $"{number}");
+
             DisplayShape(diamondPrefab);
 
             // Set button texts for odd/even check
-            leftButtonText.text = "Odd";
-            rightButtonText.text = "Even";
+            SetArabicText(leftButtonText, isEnglish ? "Odd" : "فردي");
+SetArabicText(rightButtonText, isEnglish ? "Even" : "زوجي");
+
         }
         else
         {
             currentTaskType = TaskType.GreaterLess;
-            questionText.text = $"Is number greater or less than {Mathf.CeilToInt(maxRange / 2f)}?";
-            currentNumberText.text = $"{number}";
+            SetArabicText(questionText, isEnglish ? $"Is number greater or less than {Mathf.CeilToInt(maxRange / 2f)}?" : $"هل الرقم أكبر أم أقل من {Mathf.CeilToInt(maxRange / 2f)}؟");
+SetArabicText(currentNumberText, $"{number}");
 
-            DisplayShape(squarePrefab);
 
-            // Set button texts for greater/less check
-            leftButtonText.text = "HIGH";
-            rightButtonText.text = "LOW";
+
+DisplayShape(squarePrefab);
+
+// Set button texts for greater/less check
+SetArabicText(leftButtonText, isEnglish ? "HIGH" : " أكبر");
+SetArabicText(rightButtonText, isEnglish ? "LOW" : "أقل");
+
         }
 
         // Update UI elements for score, level, and question count
@@ -221,15 +266,18 @@ public class Task8 : MonoBehaviour
 
         Debug.Log("Task ended due to 4 consecutive wrong answers.");
         // Display task end message if desired (optional)
-        questionText.text = "Task Ended!";
+        SetArabicText(questionText, isEnglish ? "Task Ended!" : "انتهت المهمة!");
+
+
     }
 
     void UpdateUI()
     {
         // Update the displayed score, level, and question count
-        scoreText.text = $"Score: {score}";
-        levelText.text = $"Level: {currentLevel}";
-        currentQuestionText.text = $"Question: {questionCount}/{questionPerLevel}";
+        scoreText.text = isEnglish ? $"Score: {score}" : $"النتيجة: {score}";
+levelText.text = isEnglish ? $"Level: {currentLevel}" : $"المستوى: {currentLevel}";
+currentQuestionText.text = isEnglish ? $"Question: {questionCount}/{questionPerLevel}" : $"السؤال: {questionCount}/{questionPerLevel}";
+
     }
 
     public void SetDifficultyLevel(int level)

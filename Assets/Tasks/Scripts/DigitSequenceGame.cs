@@ -10,6 +10,8 @@ public class DigitSequenceGame : MonoBehaviour
     public TextMeshProUGUI instructionText;
     public Button rightButton;
     public Button wrongButton;
+    public TextMeshProUGUI rightButtonText;
+    public TextMeshProUGUI wrongButtonText;
     public TextMeshProUGUI scoreText;
     public TextMeshProUGUI levelText;  // Display current level
     public TextMeshProUGUI questionText; // Display current question number
@@ -45,12 +47,50 @@ private int totalQuestions = 0;
 private int consecutiveWrong = 0;
 public int maxconsecutiveWrong = 4;
 
+public bool isEnglish = true; // Default to English
+
+    public void SetLanguage()
+    {
+        isEnglish = false;
+         Debug.Log("isEnglish>: " + isEnglish); // Debugging purpose
+         
+    }
     void Start()
     {
         audioSource = GetComponent<AudioSource>();
         rightButton.onClick.AddListener(OnRightButtonClicked);
         wrongButton.onClick.AddListener(OnWrongButtonClicked);
+        AddArabicFixerToAllText();
+       
         StartNewSequence();
+    }
+    void AddArabicFixerToAllText()
+{
+    TextMeshProUGUI[] allTextElements = {wrongButtonText, rightButtonText, instructionText, scoreText, levelText, 
+                                          questionText, responseTimeText, AvergeResponseTimeText, accuracyRateText };
+
+    foreach (TextMeshProUGUI textElement in allTextElements)
+    {
+        if (textElement != null)
+        {
+            ArabicFixerTMPRO fixer = textElement.GetComponent<ArabicFixerTMPRO>();
+            if (fixer == null)
+            {
+                textElement.gameObject.AddComponent<ArabicFixerTMPRO>();
+            }
+        }
+    }
+}
+    private void SetArabicText(TMP_Text textElement, string newText)
+    {
+        if (textElement != null)
+        {
+            ArabicFixerTMPRO arabicFixer = textElement.GetComponent<ArabicFixerTMPRO>();
+            if (arabicFixer != null)
+            {
+                arabicFixer.fixedText = newText;
+            }
+        }
     }
     public void SetLevelAndStartTask(int level)
     {
@@ -63,16 +103,45 @@ public int maxconsecutiveWrong = 4;
 
     private void StartNewSequence()
     {
+         SetArabicText(rightButtonText, 
+        !isEnglish 
+        ? "نعم" 
+        : "YES");
+         SetArabicText(wrongButtonText, 
+        !isEnglish 
+        ? "لا" 
+        : "NO");
         GenerateSequence();
-        instructionText.text = "Memorize the sequence!";
-        rightButton.gameObject.SetActive(false);
-        wrongButton.gameObject.SetActive(false);
-        resultsUI.gameObject.SetActive(false);
-        TaskUI.gameObject.SetActive(true);
-        responseTimeText.text = "";
-        questionText.text = "Question: " + (questionCount + 1) + " / " + maxQuestionsPerLevel;
-        levelText.text = "Level: " + (currentLevel + 1);
-        scoreText.text = "Score: " + score;
+        SetArabicText(instructionText, 
+    !isEnglish 
+    ? "احفظ التسلسل!" 
+    : "Memorize the sequence!");
+
+rightButton.gameObject.SetActive(false);
+wrongButton.gameObject.SetActive(false);
+resultsUI.gameObject.SetActive(false);
+TaskUI.gameObject.SetActive(true);
+
+SetArabicText(responseTimeText, 
+    !isEnglish 
+    ? "" 
+    : "");
+
+SetArabicText(questionText, 
+    !isEnglish 
+    ? $"السؤال: {questionCount + 1} / {maxQuestionsPerLevel}" 
+    : $" {questionCount + 1} / {maxQuestionsPerLevel}: Question");
+
+SetArabicText(levelText, 
+    !isEnglish 
+    ? $"المستوى: {currentLevel + 1}" 
+    : $"{currentLevel + 1}:Level");
+
+SetArabicText(scoreText, 
+    !isEnglish 
+    ? $"الدرجة: {score}" 
+    : $"{score}:Score");
+
         StartCoroutine(DisplaySequence());
     }
     
@@ -111,7 +180,11 @@ public int maxconsecutiveWrong = 4;
 
     private void PromptForAnswer()
     {
-        instructionText.text = $"Was the number {randomPromptNumber} in the sequence?";
+        SetArabicText(instructionText, 
+    !isEnglish 
+    ? $"هل كان الرقم {randomPromptNumber} في التسلسل؟" 
+    : $"Was the number {randomPromptNumber} in the sequence?");
+
         digitText.color = digitColorsPerLevel[currentLevel];  // Use level color
         digitText.text = randomPromptNumber.ToString();
         promptDisplayTime = Time.time;
@@ -135,7 +208,11 @@ public int maxconsecutiveWrong = 4;
     private void RecordResponseTime()
 {
     float responseTime = Time.time - promptDisplayTime;
-    responseTimeText.text = "Response Time: " + responseTime.ToString("F2") + " seconds";
+    SetArabicText(responseTimeText, 
+    !isEnglish 
+    ? $"وقت الاستجابة: {responseTime.ToString("F2")} ثواني" 
+    : $"Response Time: {responseTime.ToString("F2")} seconds");
+
     totalResponseTime += responseTime; // Accumulate total response time
 }
 
@@ -145,25 +222,36 @@ public int maxconsecutiveWrong = 4;
     bool isCorrectAnswer = digitSequence.Contains(randomPromptNumber);
     
     if ((isRightButtonClicked && isCorrectAnswer) || (!isRightButtonClicked && !isCorrectAnswer))
-    {
-        score++;
-        correctResponses++; // Increment correct responses if the answer is correct
-        instructionText.text = "Correct!";
-        PlaySound(correctSound);
-        consecutiveWrong=0;
-    }
-    else
-    {
-        consecutiveWrong++;
-        instructionText.text = "Incorrect!";
-        PlaySound(incorrectSound);
-    }
+{
+    score++;
+    correctResponses++; // Increment correct responses if the answer is correct
+    SetArabicText(instructionText, 
+        !isEnglish 
+        ? "صحيح!" // Arabic for Correct!
+        : "Correct!"); // English for Correct!
+    PlaySound(correctSound);
+    consecutiveWrong = 0;
+}
+else
+{
+    consecutiveWrong++;
+    SetArabicText(instructionText, 
+        !isEnglish 
+        ? "غير صحيح!" // Arabic for Incorrect!
+        : "Incorrect!"); // English for Incorrect!
+    PlaySound(incorrectSound);
+}
+
 if(consecutiveWrong==maxconsecutiveWrong)
 {
     DisplayResults();
 }
     totalQuestions++; // Increment total questions counter
-    scoreText.text = "Score: " + score;
+  SetArabicText(scoreText, 
+    !isEnglish 
+    ? $"الدرجة: {score}" // Arabic for Score
+    : $" {score} :Score"); // English for Score
+
 
     rightButton.gameObject.SetActive(false);
     wrongButton.gameObject.SetActive(false);
@@ -188,7 +276,11 @@ if(consecutiveWrong==maxconsecutiveWrong)
     {
         currentLevel++;
         questionCount = 0;
-        instructionText.text = $"Level {currentLevel + 1}!";
+        SetArabicText(instructionText, 
+    !isEnglish 
+    ? $"المستوى {currentLevel + 1}!" // Arabic for Level
+    : $"{currentLevel + 1}! Level "); // English for Level
+
         Invoke("StartNewSequence", 2.0f);
     }
     else
@@ -212,9 +304,21 @@ if(consecutiveWrong==maxconsecutiveWrong)
     float accuracyRate = (float)correctResponses / totalQuestions * 100f;
 
     // Display results in the UI
-    instructionText.text = "Game Over! Here are your results:";
-    AvergeResponseTimeText.text = "Average Response Time: " + averageResponseTime.ToString("F2") + " seconds";
-    accuracyRateText.text = "Accuracy Rate: " + accuracyRate.ToString("F2") + "%";
+  SetArabicText(instructionText, 
+    !isEnglish 
+    ? "انتهت اللعبة! هنا نتائجك:" // Arabic for "Game Over! Here are your results:"
+    : "Game Over! Here are your results:"); // English for "Game Over! Here are your results:"
+
+SetArabicText(AvergeResponseTimeText, 
+    !isEnglish 
+    ? $"متوسط وقت الاستجابة: {averageResponseTime.ToString("F2")} ثانية" // Arabic for "Average Response Time"
+    : $"Average Response Time: {averageResponseTime.ToString("F2")} seconds"); // English for "Average Response Time"
+
+SetArabicText(accuracyRateText, 
+    !isEnglish 
+    ? $"معدل الدقة: {accuracyRate.ToString("F2")}% " // Arabic for "Accuracy Rate"
+    : $"{accuracyRate.ToString("F2")}%: Accuracy Rate"); // English for "Accuracy Rate"
+
 }
 
 

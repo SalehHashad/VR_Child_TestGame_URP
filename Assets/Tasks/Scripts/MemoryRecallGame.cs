@@ -41,6 +41,45 @@ public  int maxErrors = 4; // The maximum allowed errors per level
     public GameObject taskUI;
 public GameObject onboardingUI;
 
+    public bool isEnglish = true; // Default to English
+
+    public void SetLanguage()
+    {
+        isEnglish = false;
+         Debug.Log("isEnglish>: " + isEnglish); // Debugging purpose
+         
+    }
+    void AddArabicFixerToAllText()
+{
+    TextMeshProUGUI[] allTextElements = { questionCounterText, LevelText,
+        recallTimeText,feedbackText,scoreText};
+
+    foreach (TextMeshProUGUI textElement in allTextElements)
+    {
+        if (textElement != null)
+        {
+            ArabicFixerTMPRO fixer = textElement.GetComponent<ArabicFixerTMPRO>();
+            if (fixer == null)
+            {
+                textElement.gameObject.AddComponent<ArabicFixerTMPRO>();
+            }
+        }
+    }
+}
+
+    private void SetArabicText(TMP_Text textElement, string newText)
+{
+    if (textElement != null)
+    {
+        ArabicFixerTMPRO arabicFixer = textElement.GetComponent<ArabicFixerTMPRO>();
+        if (arabicFixer != null)
+        {
+            arabicFixer.fixedText = newText;
+        }
+        textElement.text = newText; // Ensure the text updates correctly
+    }
+}
+
     // Level configurations
     private class LevelConfig
     {
@@ -80,18 +119,21 @@ void PlaySound(AudioClip clip)
 }
     void Start()
     {
+        AddArabicFixerToAllText();
         audioSource = gameObject.AddComponent<AudioSource>();
         // StartNextLevel();
         taskUI.SetActive(false);
         onboardingUI.SetActive(true);
-        scoreText.text = $"Score: {score}";
+        SetArabicText(scoreText, isEnglish ? $"Score: {score}" : $"النتيجة: {score}");
+        SetArabicText(recallTimeText, isEnglish ? $"Time {recallTime}" : $"الوقت {recallTime}");
+
     }
     void Update()
     {
-        scoreText.text = $"Score: {score}";
-        // recallTimeText.text=$"Time {recallTime}";
-        LevelText.text=$"Level {currentLevel}";
-        questionCounterText.text=$"Question{questionCounter}/{questionsPerLevel}";
+        SetArabicText(scoreText, isEnglish ? $"Score: {score}" : $"النتيجة: {score}");
+SetArabicText(LevelText, isEnglish ? $"Level {currentLevel}" : $"المستوى {currentLevel}");
+SetArabicText(questionCounterText, isEnglish ? $"Question {questionCounter}/{questionsPerLevel}" : $"السؤال {questionCounter}/{questionsPerLevel}");
+
     }
 
     // Starts the next level or question
@@ -179,7 +221,8 @@ void PlaySound(AudioClip clip)
 
     IEnumerator ShowSequence(float baseSpeed)
 {
-    feedbackText.text = "Memorize the sequence!";
+    SetArabicText(feedbackText, isEnglish ? "Memorize the sequence!" : "احفظ التسلسل!");
+
     for (int i = 0; i < sequence.Count; i++)
     {
         int index = sequence[i];
@@ -206,7 +249,8 @@ void PlaySound(AudioClip clip)
     //     // GetComponent<Renderer>().material.color = Color.black;
     // }
 
-    feedbackText.text = "Click the cubes to recall the sequence!";
+    SetArabicText(feedbackText, isEnglish ? "Click the cubes to recall the sequence!" : "انقر على المكعبات لاسترجاع التسلسل!");
+
     recallStartTime = Time.time;
     isRecalling = true;
 }
@@ -272,7 +316,8 @@ void PlaySound(AudioClip clip)
     recallEndTime = Time.time;
     recallTime = recallEndTime - recallStartTime;
 
-    recallTimeText.text = $"Time {recallTime}";
+    SetArabicText(recallTimeText, isEnglish ? $"Time {recallTime}" : $"الوقت {recallTime}");
+
 
     int correctCount = 0;
     
@@ -312,25 +357,32 @@ void PlaySound(AudioClip clip)
     score += points; // Add points to the score
     questionCounter++;
 
-    scoreText.text = $"Score: {score}";
-    feedbackText.text = $"You got {correctCount}/{sequence.Count} correct! (+{points} points)\nTotal errors: {totalErrors}/{maxErrors}";
+    SetArabicText(scoreText, isEnglish ? $"Score: {score}" : $"النتيجة: {score}");
+SetArabicText(feedbackText, isEnglish ? 
+    $"You got {correctCount}/{sequence.Count} correct! (+{points} points)\nTotal errors: {totalErrors}/{maxErrors}" : 
+    $"أنت حصلت على {correctCount}/{sequence.Count} صحيح! (+{points} نقاط)\nإجمالي الأخطاء: {totalErrors}/{maxErrors}");
 
-    // Check if errors exceed the limit
-    if (totalErrors >= maxErrors)
-    {
-        feedbackText.text = $"Maximum errors reached! Level failed.\nTotal errors: {totalErrors}/{maxErrors}";
-        EndTask(); // End the level if max errors reached
-        return;
-    }
+// Check if errors exceed the limit
+if (totalErrors >= maxErrors)
+{
+    SetArabicText(feedbackText, isEnglish ? 
+        $"Maximum errors reached! Level failed.\nTotal errors: {totalErrors}/{maxErrors}" : 
+        $"تم الوصول إلى الحد الأقصى من الأخطاء! فشل المستوى.\nإجمالي الأخطاء: {totalErrors}/{maxErrors}");
+    EndTask(); // End the level if max errors reached
+    return;
+}
 
-    // Check if the level is complete (all questions are done)
-    if (questionCounter >= questionsPerLevel)
-    {
-         totalErrors = 0; // Reset errors for this evaluation
-        currentLevel++;
-        questionCounter = 0;
-        feedbackText.text = $"Level Up! Welcome to Level {currentLevel}.";
-    }
+// Check if the level is complete (all questions are done)
+if (questionCounter >= questionsPerLevel)
+{
+    totalErrors = 0; // Reset errors for this evaluation
+    currentLevel++;
+    questionCounter = 0;
+    SetArabicText(feedbackText, isEnglish ? 
+        $"Level Up! Welcome to Level {currentLevel}." : 
+        $"ترقية المستوى! مرحباً بك في المستوى {currentLevel}.");
+}
+
 
     // Delay before starting the next level
     Invoke(nameof(StartNextLevel), 2f);
@@ -338,14 +390,19 @@ void PlaySound(AudioClip clip)
 void EndTask()
 {
     // Display final feedback message
-    if (totalErrors >= maxErrors)
-    {
-        feedbackText.text = $"Task Over! You reached the maximum errors ({totalErrors}/{maxErrors}).\nBetter luck next time!";
-    }
-    else
-    {
-        feedbackText.text = $"Task Completed! \nTotal score: {score}";
-    }
+   if (totalErrors >= maxErrors)
+{
+    SetArabicText(feedbackText, isEnglish ? 
+        $"Task Over! You reached the maximum errors ({totalErrors}/{maxErrors}).\nBetter luck next time!" : 
+        $"انتهت المهمة! لقد وصلت إلى الحد الأقصى من الأخطاء ({totalErrors}/{maxErrors}).\nحظاً أفضل في المرة القادمة!");
+}
+else
+{
+    SetArabicText(feedbackText, isEnglish ? 
+        $"Task Completed! \nTotal score: {score}" : 
+        $"تمت المهمة! \nإجمالي النقاط: {score}");
+}
+
 
     // Disable further inputs or actions, effectively "ending" the task
     isRecalling = false;  // Stop recall process

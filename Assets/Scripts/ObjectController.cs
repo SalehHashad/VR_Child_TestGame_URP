@@ -27,6 +27,8 @@ public class ObjectController : MonoBehaviour
     public TextMeshProUGUI scoreText;
     public TextMeshProUGUI QuestionText;
     public TextMeshProUGUI instructionText; // Instruction text for each step
+    public TextMeshProUGUI verticalButtonText; // Instruction text for each step
+    public TextMeshProUGUI horizontalButtonText; // Instruction text for each step
 
     private GameObject[] buttons = new GameObject[4]; // Array to hold button references
     private GameObject targetObject; // The target object to find in the buttons
@@ -36,24 +38,75 @@ public class ObjectController : MonoBehaviour
     public Button horizontalButton;
 
     private float targetRotation = 0f; // Track the rotation of the target object (0 or 90)
+
+    
 [Header("Audio Feedback")]
     [SerializeField] private AudioClip correctSound;
     [SerializeField] private AudioClip incorrectSound;
     private AudioSource audioSource;
 
+public bool isEnglish = true; // Default to English
+
+    public void SetLanguage()
+    {
+        isEnglish = false;
+         Debug.Log("isEnglish>: " + isEnglish); // Debugging purpose
+         
+    }
+    void AddArabicFixerToAllText()
+{
+    TextMeshProUGUI[] allTextElements = { instructionText, QuestionText,
+        scoreText,horizontalButtonText,verticalButtonText};
+
+    foreach (TextMeshProUGUI textElement in allTextElements)
+    {
+        if (textElement != null)
+        {
+            ArabicFixerTMPRO fixer = textElement.GetComponent<ArabicFixerTMPRO>();
+            if (fixer == null)
+            {
+                textElement.gameObject.AddComponent<ArabicFixerTMPRO>();
+            }
+        }
+    }
+}
+    // private void SetArabicText(TMP_Text textElement, string newText)
+    // {
+    //     if (textElement != null)
+    //     {
+    //         ArabicFixerTMPRO arabicFixer = textElement.GetComponent<ArabicFixerTMPRO>();
+    //         if (arabicFixer != null)
+    //         {
+    //             arabicFixer.fixedText = newText;
+    //         }
+    //     }
+    // }
+    private void SetArabicText(TMP_Text textElement, string newText)
+{
+    if (textElement != null)
+    {
+        ArabicFixerTMPRO arabicFixer = textElement.GetComponent<ArabicFixerTMPRO>();
+        if (arabicFixer != null)
+        {
+            arabicFixer.fixedText = newText;
+        }
+        textElement.text = newText; // Ensure the text updates correctly
+    }
+}
+
     // Countdown timer before starting the task
     IEnumerator CountdownBeforeStart()
     {
-        instructionText.text = "Task starting in 5 seconds...";
-        
-        for (int i = 0; i < 5; i++)
-        {
-            instructionText.text = $"Task starting in {5-i} seconds...";
-            yield return new WaitForSeconds(1);  // Wait for 1 seconds
-        }
-        
-        
-        instructionText.text = "Task Started!";
+        SetArabicText(instructionText, isEnglish ? "Task starting in 5 seconds..." : "المهمة تبدأ خلال 5 ثوان...");
+
+for (int i = 0; i < 5; i++)
+{
+    SetArabicText(instructionText, isEnglish ? $"Task starting in {5 - i} seconds..." : $"المهمة تبدأ خلال {5 - i} ثوان...");
+    yield return new WaitForSeconds(1);  // Wait for 1 second
+}
+
+SetArabicText(instructionText, isEnglish ? "Task Started!" : "تم بدء المهمة!");
+
 
         // Start the game after countdown
         StartNewLevel();
@@ -80,10 +133,17 @@ public class ObjectController : MonoBehaviour
         // Add listeners to the vertical and horizontal buttons
         verticalButton.onClick.AddListener(VerticalButtonClicked);
         horizontalButton.onClick.AddListener(HorizontalButtonClicked);
-        scoreText.text = "Score: " + score;
-        // Initialize the first question
-        Question = 1;  // Reset question to 1
-        QuestionText.text = "Question: " + Question + "/" + QuestionPerLevel; // Update the question text
+        AddArabicFixerToAllText();
+        SetArabicText(scoreText, isEnglish ? "Score: " + score : "النتيجة: " + score);
+        SetArabicText(horizontalButtonText, isEnglish ? "Horizontal"  : "افقي");
+        SetArabicText(verticalButtonText, isEnglish ? "Vertical" : "عمودي" );
+
+
+// Initialize the first question  
+Question = 1;  // Reset question to 1  
+
+SetArabicText(QuestionText, isEnglish ? $"Question: {Question}/{QuestionPerLevel}" : $"السؤال: {Question}/{QuestionPerLevel}");  
+
         StartCoroutine(CountdownBeforeStart());
     }
 
@@ -157,14 +217,17 @@ public class ObjectController : MonoBehaviour
 
             // Assign the correct button label
             TextMeshProUGUI buttonText = button.GetComponentInChildren<TextMeshProUGUI>();
-            buttonText.text = "Here";
+            SetArabicText(buttonText, isEnglish ? " Here" : " هنا");
+
+            // buttonText.text = "Here";
 
             // Assign button click listeners
             int index = i; // Capture index to avoid closure issue in the loop
             button.GetComponent<Button>().onClick.AddListener(() => OnButtonClick(index));
         }
 
-        instructionText.text = "Click the button representing the target object!";
+        SetArabicText(instructionText, isEnglish ? "Click the button representing the target object!" : "انقر على الزر الذي يمثل الكائن الهدف!");
+
     }
 
     void OnButtonClick(int buttonIndex)
@@ -173,7 +236,8 @@ public class ObjectController : MonoBehaviour
         {
             // Correct button clicked, increase score
             IncreaseScore();
-            instructionText.text = "Correct!";
+            SetArabicText(instructionText, isEnglish ? "Correct!" : "صحيح!");
+
             PlaySound(correctSound);
 
             // Deactivate task objects and activate QuestionObject
@@ -183,7 +247,8 @@ public class ObjectController : MonoBehaviour
         else
         {
             // Incorrect button clicked
-            instructionText.text = "Incorrect! Try again.";
+            SetArabicText(instructionText, isEnglish ? "Incorrect! Try again." : "خطأ! حاول مرة أخرى.");
+
             PlaySound(incorrectSound);
             ResetForNextRound();
         }
@@ -192,7 +257,8 @@ public class ObjectController : MonoBehaviour
     public void IncreaseScore()
     {
         score++;
-        scoreText.text = "Score: " + score;
+        SetArabicText(scoreText, isEnglish ? "Score: " + score : "النقاط: " + score);
+
     }
 
     IEnumerator ResetForNextRoundCoroutine()
@@ -208,7 +274,7 @@ public class ObjectController : MonoBehaviour
         yield return new WaitForSeconds(timeBetwenQ); // Wait before starting the next question
 
         // Display question number
-        QuestionText.text = "Question: " + Question + "/" + QuestionPerLevel;
+       SetArabicText(QuestionText, isEnglish ? "Question: " + Question + "/" + QuestionPerLevel : "السؤال: " + Question + "/" + QuestionPerLevel);
 
         // Restart the process
         SpawnObjects();
@@ -216,7 +282,8 @@ public class ObjectController : MonoBehaviour
     else
     {
         // Game over or complete
-        instructionText.text = "You've completed all questions!";
+       SetArabicText(instructionText, isEnglish ? "You've completed all questions!" : "لقد أكملت جميع الأسئلة!");
+
     }
 }
 
@@ -246,17 +313,18 @@ void ResetForNextRound()
 
     void VerticalButtonClicked()
     {
-        if (targetRotation == 0f)
-        {
-            IncreaseScore(); // Add point if the rotation is 0
-            instructionText.text = "Correct!";
-            PlaySound(correctSound);
-        }
-        else
-        {
-            instructionText.text = "Incorrect! Try again.";
-            PlaySound(incorrectSound);
-        }
+       if (targetRotation == 0f)
+{
+    IncreaseScore(); // Add point if the rotation is 0
+    SetArabicText(instructionText, isEnglish ? "Correct!" : "صحيح!");
+    PlaySound(correctSound);
+}
+else
+{
+    SetArabicText(instructionText, isEnglish ? "Incorrect! Try again." : "خطأ! حاول مرة أخرى.");
+    PlaySound(incorrectSound);
+}
+
         
         ResetForNextRound();
     }
@@ -264,16 +332,17 @@ void ResetForNextRound()
     void HorizontalButtonClicked()
     {
         if (targetRotation == 90f)
-        {
-            IncreaseScore(); // Add point if the rotation is 90
-            instructionText.text = "Correct!";
-            PlaySound(correctSound);
-        }
-        else
-        {
-            instructionText.text = "Incorrect! Try again.";
-            PlaySound(incorrectSound);
-        }
+{
+    IncreaseScore(); // Add point if the rotation is 90
+    SetArabicText(instructionText, isEnglish ? "Correct!" : "صحيح!");
+    PlaySound(correctSound);
+}
+else
+{
+    SetArabicText(instructionText, isEnglish ? "Incorrect! Try again." : "خطأ! حاول مرة أخرى.");
+    PlaySound(incorrectSound);
+}
+
         
         ResetForNextRound();
     }

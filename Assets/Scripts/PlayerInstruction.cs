@@ -16,11 +16,15 @@ public class PlayerInstruction : MonoBehaviour
 [Header("Audio Events")]
     public UnityEvent OnAudioFinished;
 
+    [Header("Language Events")]
+    public UnityEvent OnLanguageChanged;
+
     [SerializeField]
     private List<GameObject> englishInstruction = new List<GameObject>(),
                              arabicInstruction = new List<GameObject>();
 
-    
+    // Reference to LanguageManager
+    // public LanguageManager languageManager;
     // Start is called before the first frame update
     void Start()
     {
@@ -61,10 +65,13 @@ public class PlayerInstruction : MonoBehaviour
         if (clipName == "en")
         {
             instructionAudio.clip = englishClip;
+            // languageManager.SetLanguage("en"); // Change the boolean value
         }
         else if (clipName == "ar")
         {
             instructionAudio.clip = arabicClip;
+            // languageManager.SetLanguage("ar"); // Change the boolean value
+            OnLanguageChanged?.Invoke();
         }
 
         instructionCanvus.SetActive(false);

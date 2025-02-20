@@ -18,11 +18,11 @@ public class VisualAttentionTask : MonoBehaviour
     public int QuestionPerLevel = 20; // Current level
     public float roundTime = 10f; // Timer duration for each round
 
-    public TMP_Text levelText; // TextMeshPro for Level
-    public TMP_Text scoreText; // TextMeshPro for Score
-    public TMP_Text questionText; // TextMeshPro for Current Question
-    public TMP_Text instructionsText; // TextMeshPro for Instructions
-    public TMP_Text timerText; // TextMeshPro for Timer
+    public TextMeshProUGUI  levelText; // TextMeshPro for Level
+    public TextMeshProUGUI  scoreText; // TextMeshPro for Score
+    public TextMeshProUGUI  questionText; // TextMeshPro for Current Question
+    public TextMeshProUGUI  instructionsText; // TextMeshPro for Instructions
+    public TextMeshProUGUI  timerText; // TextMeshPro for Timer
 
     private List<GameObject> objects = new List<GameObject>();
     private float currentTime;
@@ -37,10 +37,47 @@ private int consecutiveWrong = 0;
 public int maxconsecutiveWrong = 4;
     private GameObject boundary;
 
+public bool isEnglish = true; // Default to English
+
+    public void SetLanguage()
+    {
+        isEnglish = false;
+         Debug.Log("isEnglish>: " + isEnglish); // Debugging purpose
+         
+    }
+    void AddArabicFixerToAllText()
+{
+    TextMeshProUGUI[] allTextElements = { timerText, instructionsText, questionText,
+        scoreText, levelText };
+
+    foreach (TextMeshProUGUI textElement in allTextElements)
+    {
+        if (textElement != null)
+        {
+            ArabicFixerTMPRO fixer = textElement.GetComponent<ArabicFixerTMPRO>();
+            if (fixer == null)
+            {
+                textElement.gameObject.AddComponent<ArabicFixerTMPRO>();
+            }
+        }
+    }
+}
+    private void SetArabicText(TMP_Text textElement, string newText)
+    {
+        if (textElement != null)
+        {
+            ArabicFixerTMPRO arabicFixer = textElement.GetComponent<ArabicFixerTMPRO>();
+            if (arabicFixer != null)
+            {
+                arabicFixer.fixedText = newText;
+            }
+        }
+    }
     private void Start()
     {
         
         boundary = GameObject.Find("Boundary");
+        AddArabicFixerToAllText();
         UpdateUI();
         StartLevel(level);
         
@@ -60,7 +97,8 @@ public int maxconsecutiveWrong = 4;
     void StartLevel(int level)
     {
         
-         instructionsText.text = " ";
+         SetArabicText(instructionsText, " ");
+
         roundActive=true;
         SetLevelParameters(level);
         currentTime = roundTime;
@@ -169,7 +207,8 @@ private IEnumerator RevertColorCoroutine(GameObject ball, float delay)
     {
         roundActive = false;
         currentTime = 0;
-        timerText.text = "Time: 0";
+        SetArabicText(timerText, isEnglish ? "Time: 0" : "الوقت: 0");
+
 
         // Stop all spheres and change their color to black
         foreach (GameObject sphere in objects)
@@ -183,7 +222,8 @@ private IEnumerator RevertColorCoroutine(GameObject ball, float delay)
         }
 
         // Update instructions and deactivate boundary
-        instructionsText.text = "Time's up! Click on the spheres to identify them.";
+        SetArabicText(instructionsText, isEnglish ? "Time's up! Click on the spheres to identify them." : "انتهى الوقت! انقر على الكرات للتعرف عليها.");
+
         // GameObject boundary = GameObject.Find("Boundary");
         if (boundary != null)
         {
@@ -204,14 +244,15 @@ private IEnumerator RevertColorCoroutine(GameObject ball, float delay)
         level++;
         Question = 0;
         StartLevel(level);
-        instructionsText.text = "Congratulations! Level Up!";
+        SetArabicText(instructionsText, isEnglish ? "Congratulations! Level Up!" : "مبروك! تم رفع المستوى!");
+
     }
     void UpdateUI()
 {
-    levelText.text = $"Level: {level}";
-    scoreText.text = $"Score: {score}";
-    questionText.text = $"Question: {Question+1}/{QuestionPerLevel}";
-    timerText.text = $"Time: {Mathf.Ceil(currentTime)}";
+   SetArabicText(levelText, isEnglish ? $"{level}:Level" : $"المستوى: {level}");
+SetArabicText(scoreText, isEnglish ? $"{score}:Score" : $"الدرجة: {score}");
+SetArabicText(questionText, isEnglish ? $"{Question + 1}/{QuestionPerLevel}:Question" : $"السؤال: {Question + 1}/{QuestionPerLevel}");
+SetArabicText(timerText, isEnglish ? $"{Mathf.Ceil(currentTime)}:Time" : $"الوقت: {Mathf.Ceil(currentTime)}");
 
     if (Question >= QuestionPerLevel)
     {
@@ -224,32 +265,33 @@ private IEnumerator RevertColorCoroutine(GameObject ball, float delay)
     public void OnBallClicked(bool isRed)
 {
     if (isRed)
-    {
-        correctRedObjectsCount++;
-        score += 1; // Increment score
-        instructionsText.text = "Correct! You clicked a red ball.";
-    }
-    else
-    {
-        score -= 1; // Decrement score
-        instructionsText.text = "Oops! That wasn't a red ball.";
-        consecutiveWrong++;
-        
-        correctTrackingStreak = 0;
-        
+{
+    correctRedObjectsCount++;
+    score += 1; // Increment score
+    SetArabicText(instructionsText, isEnglish ? "Correct! You clicked a red ball." : "صحيح! لقد نقرت على كرة حمراء.");
+}
+else
+{
+    score -= 1; // Decrement score
+    SetArabicText(instructionsText, isEnglish ? "Oops! That wasn't a red ball." : "عذرًا! لم تكن كرة حمراء.");
+    consecutiveWrong++;
 
-        if (consecutiveWrong >= maxconsecutiveWrong)
-        {
-            instructionsText.text = $"Too many misses ({consecutiveWrong}/{maxconsecutiveWrong}). Resetting level.";
-            consecutiveWrong=0;
-            StartLevel(level);
-        }
+    correctTrackingStreak = 0;
+
+    if (consecutiveWrong >= maxconsecutiveWrong)
+    {
+        SetArabicText(instructionsText, isEnglish ? $"Too many misses ({consecutiveWrong}/{maxconsecutiveWrong}). Resetting level." : $"العديد من الأخطاء ({consecutiveWrong}/{maxconsecutiveWrong}). إعادة تعيين المستوى.");
+        consecutiveWrong = 0;
+        StartLevel(level);
     }
+}
+
 
     // Check if the task should end due to low score
     if (score <= totalwrongError)
     {
-        scoreText.text = $"Score: {score}";
+        SetArabicText(scoreText, isEnglish ? $"Score: {score}" : $"النتيجة: {score}");
+
         StartCoroutine(EndTask());
         return;
     }
@@ -263,7 +305,8 @@ private IEnumerator EndTask()
 {
     roundActive = false;
     ClearObjects();
-    instructionsText.text = $"Game Over! Your score dropped to {totalwrongError}.";
+    SetArabicText(instructionsText, isEnglish ? $"Game Over! Your score dropped to {totalwrongError}." : $"انتهت اللعبة! لقد انخفضت نتيجتك إلى {totalwrongError}.");
+
      yield return new WaitForSeconds(2);
     resultUI.SetActive(true);
     taskUI.SetActive(false);
@@ -280,7 +323,8 @@ private IEnumerator EndTask()
         correctTrackingStreak++;
         consecutiveWrong = 0; // Reset wrong attempts
         Question++;
-        instructionsText.text = $"Great job! Streak: {correctTrackingStreak}";
+       SetArabicText(instructionsText, isEnglish ? $"Great job! Streak: {correctTrackingStreak}" : $"عمل رائع! سلسلة: {correctTrackingStreak}");
+
         StartLevel(level);
     }
     else

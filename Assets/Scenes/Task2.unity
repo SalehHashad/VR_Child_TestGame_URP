@@ -2431,7 +2431,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8330877019196067990, guid: 7feb1b28cb8ef48bebc956da8dbe9e25, type: 3}
   m_PrefabInstance: {fileID: 1463379847}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 952889594}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
@@ -4111,6 +4111,21 @@ MonoBehaviour:
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 1
+        m_CallState: 2
+  OnLanguageChanged:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1703385114}
+        m_TargetAssemblyTypeName: DigitMemoryGame, Assembly-CSharp
+        m_MethodName: SetLanguage
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
         m_CallState: 2
   englishInstruction: []
   arabicInstruction: []
@@ -6020,6 +6035,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &952889594 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7950900465869875365, guid: 7feb1b28cb8ef48bebc956da8dbe9e25, type: 3}
+  m_PrefabInstance: {fileID: 1463379847}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &952889598
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 952889594}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80172e7093d66a24a9c280683dbfd615, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fixedText: 
+  ShowTashkeel: 0
+  UseHinduNumbers: 0
 --- !u!1001 &954841839
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9630,11 +9665,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8330877019196067990, guid: 7feb1b28cb8ef48bebc956da8dbe9e25, type: 3}
       propertyPath: m_text
-      value: 00:00:00
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 8330877019196067990, guid: 7feb1b28cb8ef48bebc956da8dbe9e25, type: 3}
       propertyPath: m_fontSize
       value: 195.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8330877019196067990, guid: 7feb1b28cb8ef48bebc956da8dbe9e25, type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: f231565b871020546b70024374bcc5ea, type: 2}
+    - target: {fileID: 8330877019196067990, guid: 7feb1b28cb8ef48bebc956da8dbe9e25, type: 3}
+      propertyPath: m_fontStyle
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8330877019196067990, guid: 7feb1b28cb8ef48bebc956da8dbe9e25, type: 3}
       propertyPath: m_fontColor.a
@@ -9657,12 +9700,20 @@ PrefabInstance:
       value: 195.1
       objectReference: {fileID: 0}
     - target: {fileID: 8330877019196067990, guid: 7feb1b28cb8ef48bebc956da8dbe9e25, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: -250492331588533066, guid: f231565b871020546b70024374bcc5ea, type: 2}
+    - target: {fileID: 8330877019196067990, guid: 7feb1b28cb8ef48bebc956da8dbe9e25, type: 3}
       propertyPath: m_fontColor32.rgba
       value: 4279505940
       objectReference: {fileID: 0}
     - target: {fileID: 8330877019196067990, guid: 7feb1b28cb8ef48bebc956da8dbe9e25, type: 3}
       propertyPath: m_TextStyleHashCode
       value: -1183493901
+      objectReference: {fileID: 0}
+    - target: {fileID: 8330877019196067990, guid: 7feb1b28cb8ef48bebc956da8dbe9e25, type: 3}
+      propertyPath: m_hasFontAssetChanged
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8357416152412229117, guid: 7feb1b28cb8ef48bebc956da8dbe9e25, type: 3}
       propertyPath: ColorToken
@@ -9715,7 +9766,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7950900465869875365, guid: 7feb1b28cb8ef48bebc956da8dbe9e25, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 952889598}
   m_SourcePrefab: {fileID: 100100000, guid: 7feb1b28cb8ef48bebc956da8dbe9e25, type: 3}
 --- !u!1001 &1471800277
 PrefabInstance:
@@ -11591,8 +11645,10 @@ MonoBehaviour:
   SequencePerLevel: 20
   timeBetwenLvl: 5
   timeBetwenQ: 2
+  timeBetwenDigit: 2
   correctSound: {fileID: 8300000, guid: 17159cf7a9558de469b30ffc0047da70, type: 3}
   incorrectSound: {fileID: 8300000, guid: 6a5b229a20dcba14b905cec58ecbc96b, type: 3}
+  isEnglish: 1
 --- !u!224 &1717836438 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 1801148039425419352, guid: b73d64b0c02b0eb42bb7453e3af51766, type: 3}

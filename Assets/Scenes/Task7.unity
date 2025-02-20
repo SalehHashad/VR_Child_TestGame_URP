@@ -9976,6 +9976,26 @@ MonoBehaviour:
   instructionAudio: {fileID: 597893268}
   arabicClip: {fileID: 8300000, guid: 46384007ce7efe74a8d63f2da548ffcc, type: 3}
   englishClip: {fileID: 8300000, guid: a3ee3a969d03e8340bd4d6a11491604e, type: 3}
+  OnAudioFinished:
+    m_PersistentCalls:
+      m_Calls: []
+  OnLanguageChanged:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1703385114}
+        m_TargetAssemblyTypeName: ObjectController, Assembly-CSharp
+        m_MethodName: SetLanguage
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  englishInstruction: []
+  arabicInstruction: []
 --- !u!4 &597893270
 Transform:
   m_ObjectHideFlags: 0
@@ -14505,6 +14525,17 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &784542286 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8001154463698975047, guid: 54d66557fe6136d46b49f95e07b840c1, type: 3}
+  m_PrefabInstance: {fileID: 1831852107}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &800321229
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -27822,6 +27853,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3487081251417458456, guid: 08e1f54a131a15141b5632398abcee0d, type: 3}
   m_PrefabInstance: {fileID: 1432393169}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1536722428 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8001154463698975047, guid: 54d66557fe6136d46b49f95e07b840c1, type: 3}
+  m_PrefabInstance: {fileID: 80355879}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1553034283
 GameObject:
   m_ObjectHideFlags: 0
@@ -30019,13 +30061,17 @@ MonoBehaviour:
   rotationAxis: {x: 0, y: 0, z: 1}
   QuestionPerLevel: 50
   appearSeconds: 1
+  timeBetwenQ: 1
   scoreText: {fileID: 553715807}
   QuestionText: {fileID: 530012827}
   instructionText: {fileID: 1042884352}
+  verticalButtonText: {fileID: 1536722428}
+  horizontalButtonText: {fileID: 784542286}
   verticalButton: {fileID: 2044173565}
   horizontalButton: {fileID: 1656474337}
   correctSound: {fileID: 8300000, guid: 17159cf7a9558de469b30ffc0047da70, type: 3}
   incorrectSound: {fileID: 8300000, guid: 6a5b229a20dcba14b905cec58ecbc96b, type: 3}
+  isEnglish: 1
 --- !u!1001 &1714741047
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -79,10 +79,48 @@ public class NumberPresentation : MonoBehaviour
 
     private List<float> correctResponseTimes = new List<float>();
 
+    public bool isEnglish = true; // Default to English
+
+    public void SetLanguage()
+    {
+        isEnglish = false;
+         Debug.Log("isEnglish>: " + isEnglish); // Debugging purpose
+         
+    }
+    void AddArabicFixerToAllText()
+{
+    TextMeshProUGUI[] allTextElements = { taskTimerDisplay, nextDigitTimerDisplay, TotalDigit,
+        totalCommissionErrorsDisplay, totalOmissionErrorsDisplay, totalCorrectResponsesDisplay,
+        averageResponseTimeDisplay, correctResponsePercentageDisplay, levelDisplay };
+
+    foreach (TextMeshProUGUI textElement in allTextElements)
+    {
+        if (textElement != null)
+        {
+            ArabicFixerTMPRO fixer = textElement.GetComponent<ArabicFixerTMPRO>();
+            if (fixer == null)
+            {
+                textElement.gameObject.AddComponent<ArabicFixerTMPRO>();
+            }
+        }
+    }
+}
+    private void SetArabicText(TMP_Text textElement, string newText)
+    {
+        if (textElement != null)
+        {
+            ArabicFixerTMPRO arabicFixer = textElement.GetComponent<ArabicFixerTMPRO>();
+            if (arabicFixer != null)
+            {
+                arabicFixer.fixedText = newText;
+            }
+        }
+    }
+
     private void Start()
     {
         ShowOnboardingUI();
-
+AddArabicFixerToAllText();
         response.action.Enable();
         response.action.performed += OnResponseAction;
     }
@@ -96,12 +134,26 @@ public class NumberPresentation : MonoBehaviour
     float remainingTaskTime = Mathf.Max(0, taskDuration - elapsedTime);
     float nextDigitTimeRemaining = Mathf.Max(0, nextDisplayTime - Time.time);
 
-    taskTimerDisplay.text = $"Time Remaining: {remainingTaskTime:F0}s";
-    nextDigitTimerDisplay.text = $"Next In: {nextDigitTimeRemaining:F0}s";
-    TotalDigit.text = $"TotalDigit: {totalDigitsShown:F0}";
+    SetArabicText(taskTimerDisplay, 
+    !isEnglish 
+    ? $"الوقت المتبقي: {remainingTaskTime:F0} ثانية" 
+    : $"Time Remaining:{remainingTaskTime:F0}s");
 
-    // Update the level display UI
-    levelDisplay.text = $"Level: {currentLevel}";
+SetArabicText(nextDigitTimerDisplay, 
+    !isEnglish 
+    ? $"التالي في: {nextDigitTimeRemaining:F0} ثانية" 
+    : $"Next In:{nextDigitTimeRemaining:F0}s");
+
+SetArabicText(TotalDigit, 
+    !isEnglish 
+    ? $"إجمالي الأرقام: {totalDigitsShown:F0}" 
+    : $"Total Digits:{totalDigitsShown:F0}");
+
+SetArabicText(levelDisplay, 
+    !isEnglish 
+    ? $"المستوى: {currentLevel}" 
+    : $"Level:{currentLevel}");
+
 
     if (elapsedTime >= taskDuration)
     {
@@ -155,7 +207,11 @@ public class NumberPresentation : MonoBehaviour
         float countdown = startDelay;
         while (countdown > 0)
         {
-            taskTimerDisplay.text = $"Starting in: {countdown:F0}"; // Update countdown UI
+           SetArabicText(taskTimerDisplay, 
+    !isEnglish 
+    ? $"البدء في: {countdown:F0} ثانية" 
+    : $"Starting in:{countdown:F0}");
+
             countdown -= Time.deltaTime;
             yield return null;
         }
@@ -204,11 +260,31 @@ public class NumberPresentation : MonoBehaviour
         float averageResponseTime = correctResponseTimes.Count > 0 ? CalculateAverageResponseTime() : 0.0f;
         float correctResponsePercentage = (totalDigitsShown > 0) ? (float)correctResponseCount / totalDigitsShown * 100 : 0.0f;
 
-        totalCommissionErrorsDisplay.text = $"Total Commission Errors: {commissionErrorCount}";
-        totalOmissionErrorsDisplay.text = $"Total Omission Errors: {omissionErrorCount}";
-        totalCorrectResponsesDisplay.text = $"Total Correct Responses: {correctResponseCount}";
-        averageResponseTimeDisplay.text = $"Average Response Time: {averageResponseTime:F2}s";
-        correctResponsePercentageDisplay.text = $"Correct Response Percentage: {correctResponsePercentage:F2}%";
+        SetArabicText(totalCommissionErrorsDisplay, 
+    !isEnglish 
+    ? $"إجمالي أخطاء العمولة: {commissionErrorCount}" 
+    : $"Total Commission Errors:{commissionErrorCount}");
+
+SetArabicText(totalOmissionErrorsDisplay, 
+    !isEnglish 
+    ? $"إجمالي أخطاء الحذف: {omissionErrorCount}" 
+    : $"Total Omission Errors:{omissionErrorCount}");
+
+SetArabicText(totalCorrectResponsesDisplay, 
+    !isEnglish 
+    ? $"إجمالي الإجابات الصحيحة: {correctResponseCount}" 
+    : $"Total Correct Responses:{correctResponseCount}");
+
+SetArabicText(averageResponseTimeDisplay, 
+    !isEnglish 
+    ? $"متوسط وقت الاستجابة: {averageResponseTime:F2} ثانية" 
+    : $"Average Response Time:{averageResponseTime:F2}s");
+
+SetArabicText(correctResponsePercentageDisplay, 
+    !isEnglish 
+    ? $"نسبة الاستجابات الصحيحة: {correctResponsePercentage:F2}%" 
+    : $"Correct Response Percentage:{correctResponsePercentage:F2}%");
+
 
         response.action.Disable();
     }

@@ -783,7 +783,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 8774622382663680984, guid: 54d66557fe6136d46b49f95e07b840c1, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1281083993}
   m_SourcePrefab: {fileID: 100100000, guid: 54d66557fe6136d46b49f95e07b840c1, type: 3}
 --- !u!1001 &86145235
 PrefabInstance:
@@ -1884,6 +1887,37 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 365763371}
   m_CullTransparentMesh: 1
+--- !u!1 &379437288 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8774622382663680984, guid: 54d66557fe6136d46b49f95e07b840c1, type: 3}
+  m_PrefabInstance: {fileID: 1831852107}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &379437292 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8001154463698975047, guid: 54d66557fe6136d46b49f95e07b840c1, type: 3}
+  m_PrefabInstance: {fileID: 1831852107}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 379437288}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &379437293
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 379437288}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80172e7093d66a24a9c280683dbfd615, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fixedText: 
+  ShowTashkeel: 0
+  UseHinduNumbers: 0
 --- !u!1 &393131520
 GameObject:
   m_ObjectHideFlags: 0
@@ -6998,6 +7032,37 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!1 &1281083988 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8774622382663680984, guid: 54d66557fe6136d46b49f95e07b840c1, type: 3}
+  m_PrefabInstance: {fileID: 80355879}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1281083992 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8001154463698975047, guid: 54d66557fe6136d46b49f95e07b840c1, type: 3}
+  m_PrefabInstance: {fileID: 80355879}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1281083988}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1281083993
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1281083988}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80172e7093d66a24a9c280683dbfd615, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fixedText: 
+  ShowTashkeel: 0
+  UseHinduNumbers: 0
 --- !u!1001 &1300790191
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -11739,6 +11804,8 @@ MonoBehaviour:
   instructionText: {fileID: 411643548}
   rightButton: {fileID: 1228825878}
   wrongButton: {fileID: 1656474337}
+  rightButtonText: {fileID: 1281083992}
+  wrongButtonText: {fileID: 379437292}
   scoreText: {fileID: 553715807}
   levelText: {fileID: 530012827}
   questionText: {fileID: 1685863584}
@@ -11766,6 +11833,7 @@ MonoBehaviour:
   - {r: 1, g: 0, b: 0, a: 1}
   maxQuestionsPerLevel: 20
   maxconsecutiveWrong: 5
+  isEnglish: 1
 --- !u!224 &1717836438 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 1801148039425419352, guid: b73d64b0c02b0eb42bb7453e3af51766, type: 3}
@@ -12876,7 +12944,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 8774622382663680984, guid: 54d66557fe6136d46b49f95e07b840c1, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 379437293}
   m_SourcePrefab: {fileID: 100100000, guid: 54d66557fe6136d46b49f95e07b840c1, type: 3}
 --- !u!1 &1842733646
 GameObject:
@@ -14067,6 +14138,26 @@ MonoBehaviour:
   instructionAudio: {fileID: 2045926830}
   arabicClip: {fileID: 8300000, guid: a9c113e2ad446354db48777c0e84c5e9, type: 3}
   englishClip: {fileID: 8300000, guid: d174b1051d20a9a49911eafff48c6b52, type: 3}
+  OnAudioFinished:
+    m_PersistentCalls:
+      m_Calls: []
+  OnLanguageChanged:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1703385114}
+        m_TargetAssemblyTypeName: DigitSequenceGame, Assembly-CSharp
+        m_MethodName: SetLanguage
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  englishInstruction: []
+  arabicInstruction: []
 --- !u!4 &2045926832
 Transform:
   m_ObjectHideFlags: 0

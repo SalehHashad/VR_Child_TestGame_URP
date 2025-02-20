@@ -29300,6 +29300,24 @@ MonoBehaviour:
   instructionAudio: {fileID: 1679599439}
   arabicClip: {fileID: 8300000, guid: e94f5807ac042be48b280ef92d96a0b9, type: 3}
   englishClip: {fileID: 8300000, guid: b68ee520af3803f45ae1225e55cecc2f, type: 3}
+  OnAudioFinished:
+    m_PersistentCalls:
+      m_Calls: []
+  OnLanguageChanged:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1703385114}
+        m_TargetAssemblyTypeName: Task8, Assembly-CSharp
+        m_MethodName: SetLanguage
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   englishInstruction: []
   arabicInstruction: []
 --- !u!4 &1679599441
@@ -29889,6 +29907,7 @@ MonoBehaviour:
   correctSound: {fileID: 8300000, guid: 17159cf7a9558de469b30ffc0047da70, type: 3}
   wrongSound: {fileID: 8300000, guid: 6a5b229a20dcba14b905cec58ecbc96b, type: 3}
   maxConsecutiveWrong: 4
+  isEnglish: 1
 --- !u!82 &1703385115
 AudioSource:
   m_ObjectHideFlags: 0

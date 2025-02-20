@@ -10,9 +10,9 @@ public class Task1 : MonoBehaviour
     // UI Elements
     public GameObject fixationPoint; // The "+" sign for fixation
     public GameObject cuePrefab; // The "*" for the cue
-    public TMP_Text levelText; // Displays the current level
-    public TMP_Text questionCounterText; // Displays the current question
-    public TMP_Text feedbackText; // Displays feedback (e.g., "Correct", "Wrong")
+    public TextMeshProUGUI levelText; // Displays the current level
+    public TextMeshProUGUI questionCounterText; // Displays the current question
+    public TextMeshProUGUI feedbackText; // Displays feedback (e.g., "Correct", "Wrong")
     public TextMeshProUGUI orientingText;
     public TextMeshProUGUI executiveControlText;
     public TextMeshProUGUI alertingText;
@@ -86,7 +86,44 @@ public GameObject resultUI;
 
 private Button rightButtonComponent; // Reference to the Button component
     private Button leftButtonComponent;  // Reference to the Button component
+public bool isEnglish = true; // Default to English
 
+    public void SetLanguage()
+    {
+        isEnglish = false;
+         Debug.Log("isEnglish>: " + isEnglish); // Debugging purpose
+         
+    }
+    void AddArabicFixerToAllText()
+{
+    TextMeshProUGUI[] allTextElements = {alertingText, executiveControlText,
+        orientingText,feedbackText,questionCounterText,levelText};
+
+    foreach (TextMeshProUGUI textElement in allTextElements)
+    {
+        if (textElement != null)
+        {
+            ArabicFixerTMPRO fixer = textElement.GetComponent<ArabicFixerTMPRO>();
+            if (fixer == null)
+            {
+                textElement.gameObject.AddComponent<ArabicFixerTMPRO>();
+            }
+        }
+    }
+}
+
+    private void SetArabicText(TMP_Text textElement, string newText)
+{
+    if (textElement != null)
+    {
+        ArabicFixerTMPRO arabicFixer = textElement.GetComponent<ArabicFixerTMPRO>();
+        if (arabicFixer != null)
+        {
+            arabicFixer.fixedText = newText;
+        }
+        textElement.text = newText; // Ensure the text updates correctly
+    }
+}
    
     public float CalculateFixationTimeAndIti(int currentLevel, int currentQuestion, bool isFixationTime)
     {
@@ -109,6 +146,7 @@ private Button rightButtonComponent; // Reference to the Button component
 
     void Start()
     {
+        AddArabicFixerToAllText();
         rightButtonComponent = rightButton.GetComponent<Button>();
         leftButtonComponent = leftButton.GetComponent<Button>();
         // Check if AudioSource is already attached to the GameObject
@@ -517,6 +555,7 @@ void CreateSurroundingArrows(string state, string location)
 
     void ShowFeedback(string message)
     {
+        
         feedbackText.text = message;
         feedbackText.gameObject.SetActive(true);
     }

@@ -20589,6 +20589,24 @@ MonoBehaviour:
   instructionAudio: {fileID: 1014824243}
   arabicClip: {fileID: 8300000, guid: 93722d8da706c12469d719e05591d38e, type: 3}
   englishClip: {fileID: 8300000, guid: 3db8ce2706bffa74d8b21f36aa3139e2, type: 3}
+  OnAudioFinished:
+    m_PersistentCalls:
+      m_Calls: []
+  OnLanguageChanged:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1703385115}
+        m_TargetAssemblyTypeName: VisualAttentionTask, Assembly-CSharp
+        m_MethodName: SetLanguage
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   englishInstruction: []
   arabicInstruction: []
 --- !u!4 &1014824245
@@ -33213,6 +33231,7 @@ MonoBehaviour:
   instructionsText: {fileID: 411643548}
   timerText: {fileID: 1685863584}
   maxconsecutiveWrong: 2
+  isEnglish: 1
 --- !u!1001 &1714741047
 PrefabInstance:
   m_ObjectHideFlags: 0

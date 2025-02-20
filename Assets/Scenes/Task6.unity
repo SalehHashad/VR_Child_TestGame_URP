@@ -9314,6 +9314,26 @@ MonoBehaviour:
   instructionAudio: {fileID: 572979052}
   arabicClip: {fileID: 8300000, guid: 876488ee2d739314f9d69288a5afa906, type: 3}
   englishClip: {fileID: 8300000, guid: e441e13a75672f94da9b367729500f70, type: 3}
+  OnAudioFinished:
+    m_PersistentCalls:
+      m_Calls: []
+  OnLanguageChanged:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1703385114}
+        m_TargetAssemblyTypeName: CountingBall, Assembly-CSharp
+        m_MethodName: SetLanguage
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  englishInstruction: []
+  arabicInstruction: []
 --- !u!4 &572979054
 Transform:
   m_ObjectHideFlags: 0
@@ -29842,6 +29862,7 @@ MonoBehaviour:
   questionPerLevel: 20
   keyboard: {fileID: 762645387}
   spawnPoint: {fileID: 687271623}
+  isEnglish: 1
 --- !u!1001 &1714741047
 PrefabInstance:
   m_ObjectHideFlags: 0

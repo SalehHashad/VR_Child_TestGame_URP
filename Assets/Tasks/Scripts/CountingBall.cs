@@ -40,49 +40,94 @@ public class CountingBall : MonoBehaviour
     public int questionPerLevel = 20;
     public GameObject keyboard;
     public Transform spawnPoint;
+public bool isEnglish = true; // Default to English
 
+    public void SetLanguage()
+    {
+        isEnglish = false;
+         Debug.Log("isEnglish>: " + isEnglish); // Debugging purpose
+         
+    }
+    void AddArabicFixerToAllText()
+{
+    TextMeshProUGUI[] allTextElements = { timeDuration, instructionText, questionText,
+        scoreText,levelText};
+
+    foreach (TextMeshProUGUI textElement in allTextElements)
+    {
+        if (textElement != null)
+        {
+            ArabicFixerTMPRO fixer = textElement.GetComponent<ArabicFixerTMPRO>();
+            if (fixer == null)
+            {
+                textElement.gameObject.AddComponent<ArabicFixerTMPRO>();
+            }
+        }
+    }
+}
+    private void SetArabicText(TMP_Text textElement, string newText)
+    {
+        if (textElement != null)
+        {
+            ArabicFixerTMPRO arabicFixer = textElement.GetComponent<ArabicFixerTMPRO>();
+            if (arabicFixer != null)
+            {
+                arabicFixer.fixedText = newText;
+            }
+        }
+    }
     void Start()
     {
+        AddArabicFixerToAllText();
         submitButton.onClick.AddListener(OnSubmitAnswer);
+        UpdateScoreText();
         StartCoroutine(StartTask());
     }
 
     IEnumerator StartTask()
     {
+        UpdateScoreText();
         for (int i = 1; i <= 5; i++)
         {
+            UpdateScoreText();
             StartLevel(i);
+           
             while (questionsRemaining > 0)
             {
                 SpawnBalls();
+                UpdateScoreText();
                 StartCoroutine(StartCountdown(displayTime)); // Start countdown coroutine
                 yield return new WaitForSeconds(displayTime);
 
                 ClearBalls();
-                instructionText.text = "How many balls were there?";
+                SetArabicText(instructionText, isEnglish ? "How many balls were there?" : "كم عدد الكرات التي كانت موجودة؟");
+
                 submitButton.interactable = true;
 
                 // Update the question text
+                UpdateQuestionText();
                 UpdateQuestionText();
                 yield return new WaitUntil(() => !submitButton.interactable);
                 questionsRemaining--;
             }
             // Congratulate the player after completing all questions in the level
-            instructionText.text = "Congratulations! Level " + currentLevel + " completed!";
+            SetArabicText(instructionText, isEnglish ? "Congratulations! Level " + currentLevel + " completed!" : "تهانينا! تم إكمال المستوى " + currentLevel + "!");
+
             yield return new WaitForSeconds(2f); // Wait for 2 seconds before starting the next level
         }
     }
      IEnumerator StartCountdown(float duration)
+{
+    float timeRemaining = duration;
+    while (timeRemaining > 0)
     {
-        float timeRemaining = duration;
-        while (timeRemaining > 0)
-        {
-            timeDuration.text = "Time: " + timeRemaining.ToString("F1") + "s";
-            timeRemaining -= Time.deltaTime;
-            yield return null;
-        }
-        timeDuration.text = "Time: 0.0s";
+        SetArabicText(timeDuration, isEnglish ? "Time: " + timeRemaining.ToString("F1") + "s" : "الوقت: " + timeRemaining.ToString("F1") + " ثانية");
+        timeRemaining -= Time.deltaTime;
+        yield return null;
     }
+    SetArabicText(timeDuration, isEnglish ? "Time: 0.0s" : "الوقت: 0.0 ثانية");
+}
+
 
     void StartLevel(int level)
     {
@@ -107,8 +152,9 @@ public class CountingBall : MonoBehaviour
         }
         questionsRemaining = questionPerLevel;
         UpdateScoreText();
-        levelText.text = "Level: " + currentLevel; // Update the level text
-        instructionText.text = "Level " + level + ": Count the balls!";
+        SetArabicText(levelText, isEnglish ? "Level: " + currentLevel : "المستوى: " + currentLevel);
+SetArabicText(instructionText, isEnglish ? "Level " + level + ": Count the balls!" : "المستوى " + level + ": احسب الكرات!");
+
     }
 
     void SpawnBalls()
@@ -175,26 +221,27 @@ public class CountingBall : MonoBehaviour
 void CheckAnswer(int userAnswer)
 {
     if (userAnswer == correctCount)
+{
+    score += 1;
+    consecutiveCorrect++;
+    SetArabicText(instructionText, isEnglish ? "Correct!" : "صحيح!");
+    audioSource.clip = correctSound;  // Set correct sound clip
+}
+else
+{
+    consecutiveCorrect = 0;
+    errorCount++; // Increment error count
+    SetArabicText(instructionText, isEnglish ? "Incorrect. Try again!" : "خطأ. حاول مرة أخرى!");
+    audioSource.clip = wrongSound;    // Set wrong sound clip
+    
+    // Check if errors have reached 4
+    if (errorCount >= maxTotalErrors)
     {
-        score += 1;
-        consecutiveCorrect++;
-        instructionText.text = "Correct!";
-        audioSource.clip = correctSound;  // Set correct sound clip
+        EndTask(); // Call the method to end the task
+        return;    // Stop further processing
     }
-    else
-    {
-        consecutiveCorrect = 0;
-        errorCount++; // Increment error count
-        instructionText.text = "Incorrect. Try again!";
-        audioSource.clip = wrongSound;    // Set wrong sound clip
-        
-        // Check if errors have reached 4
-        if (errorCount >= maxTotalErrors)
-        {
-            EndTask(); // Call the method to end the task
-            return;    // Stop further processing
-        }
-    }
+}
+
 
     audioSource.Play(); // Play the selected sound
     UpdateScoreText();
@@ -203,7 +250,8 @@ void CheckAnswer(int userAnswer)
 void EndTask()
 {
     StopAllCoroutines(); // Stop all coroutines to end the task
-    instructionText.text = "Task ended due to too many errors.";
+    SetArabicText(instructionText, isEnglish ? "Task ended due to too many errors." : "تم إنهاء المهمة بسبب عدد كبير من الأخطاء.");
+
     submitButton.interactable = false;
     ShowKeyboard(false); // Hide the keyboard
     ClearBalls();        // Clear the balls
@@ -212,13 +260,16 @@ void EndTask()
 
     void UpdateScoreText()
     {
-        scoreText.text = "Score: " + score;
+        SetArabicText(scoreText, isEnglish ? score+ ":Score" : "النقاط: " + score);
+         SetArabicText(levelText, isEnglish ? currentLevel+ ":Level" : "المستوى: " + currentLevel);
+
     }
 
     void UpdateQuestionText()
     {
         int currentQuestion = questionPerLevel - questionsRemaining + 1;
-        questionText.text = "Question: " + currentQuestion + "/" + questionPerLevel; // Update the question text
+        SetArabicText(questionText, isEnglish ? currentQuestion + "/" + questionPerLevel+":Question" : "السؤال: " + currentQuestion + "/" + questionPerLevel);
+
     }
 
     void ShowKeyboard(bool show)

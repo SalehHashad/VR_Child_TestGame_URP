@@ -52,6 +52,14 @@ public class DigitMemoryGame : MonoBehaviour
     private int failedSequences = 0;  // Counter to track consecutive failed sequences
     private int totalCorrectResponses = 0;
     private int longestSequence = 0;
+    
+    public bool isEnglish = true; // Default to English
+
+    public void SetLanguage()
+    {
+        isEnglish = false;
+         Debug.Log("isEnglish>: " + isEnglish); // Debugging purpose
+    }
 
     void Start()
     {
@@ -59,11 +67,38 @@ public class DigitMemoryGame : MonoBehaviour
         submitButton.onClick.AddListener(CheckUserResponse);
         
         resultsPanel.SetActive(false); // Hide results panel at the start
-        TaskUI.SetActive(true);
+        // TaskUI.SetActive(true);
 
         ///====code modified here ===..//
         // OnboardingUI.SetActive(true);
     // StartClick();
+
+        TMP_Text[] allTextElements = { instructionText, firstAttemptScoreText, secondAttemptScoreText, thirdAttemptScoreText, 
+                                       fourthAttemptScoreText, totalCorrectResponsesText, longestSequenceText, 
+                                       currentLevelText, currentSequenceText };
+
+        foreach (TMP_Text textElement in allTextElements)
+        {
+            if (textElement != null)
+            {
+                ArabicFixerTMPRO fixer = textElement.GetComponent<ArabicFixerTMPRO>();
+                if (fixer == null)
+                {
+                    textElement.gameObject.AddComponent<ArabicFixerTMPRO>();
+                }
+            }
+        }
+    }
+    private void SetArabicText(TMP_Text textElement, string newText)
+    {
+        if (textElement != null)
+        {
+            ArabicFixerTMPRO arabicFixer = textElement.GetComponent<ArabicFixerTMPRO>();
+            if (arabicFixer != null)
+            {
+                arabicFixer.fixedText = newText;
+            }
+        }
     }
     public void SetLevelAndStartTask(int level)
     {
@@ -82,22 +117,39 @@ public class DigitMemoryGame : MonoBehaviour
         resultsPanel.SetActive(false);  // Deactivate Onboarding UI
         TaskUI.SetActive(true);  // Activate Task UI
         Keyboard.SetActive(true);  // Activate Task UI
+        UpdateLevelUI();
         StartCoroutine(CountdownBeforeStart());
+        
     }
 
     // Countdown timer before starting the task
     IEnumerator CountdownBeforeStart()
     {
-        instructionText.text = "Task starting in 5 seconds...";
+        // instructionText.text = "Task starting in 5 seconds...";
+        SetArabicText(instructionText, 
+    !isEnglish 
+    ? ("البداء في 5 ثواني ") 
+    : ("Task starting in 5 seconds..." ));
+        // instructionText.text = "البداء في 5 ثواني";
         
         for (int i = 0; i < 5; i++)
         {
-            instructionText.text = $"Task starting in {5-i} seconds...";
+
+            SetArabicText(instructionText, 
+    !isEnglish 
+    ? $"البداء في {5 - i} ثواني" 
+    : $"Task starting in {5 - i} seconds");
+
             yield return new WaitForSeconds(1);  // Wait for 1 seconds
         }
         
         
-        instructionText.text = "Task Started!";
+        // instructionText.text = "Task Started!";
+        SetArabicText(instructionText, 
+    !isEnglish 
+    ? "المهمه بدات" 
+    : "Task started");
+
 
         // Start the game after countdown
         StartNewLevel();
@@ -110,32 +162,51 @@ public class DigitMemoryGame : MonoBehaviour
         totalCorrectResponses = 0;
 
         switch (currentLevel)
-        {
-            case 1:
-                sequenceLength = Mathf.Clamp(2 + sequenceInLevel, 2, 10);
-                instructionText.text = "Level 1: Enter the sequence in the same order.";
-                break;
-            case 2:
-                sequenceLength = Mathf.Clamp(2 + sequenceInLevel, 2, 10);
-                instructionText.text = "Level 2: Enter the sequence in reverse order.";
-                break;
-            case 3:
-                sequenceLength = Mathf.Clamp(3 + sequenceInLevel, 3, 11);
-                instructionText.text = "Level 3: Enter the sequence in reverse order.";
-                break;
-            case 4:
-                sequenceLength = Mathf.Clamp(4 + sequenceInLevel, 4, 12);
-                instructionText.text = "Level 4: Enter the sequence in reverse order.";
-                break;
-            case 5:
-                sequenceLength = Mathf.Clamp(5 + sequenceInLevel, 5, 13);
-                instructionText.text = "Level 5: Enter the sequence in reverse order.";
-                break;
-            default:
-                sequenceLength = Mathf.Clamp(5 + (currentLevel - 1), 5, 13);
-                instructionText.text = $"Level {currentLevel}: Enter the sequence in reverse order.";
-                break;
-        }
+{
+    case 1:
+        sequenceLength = Mathf.Clamp(2 + sequenceInLevel, 2, 10);
+        SetArabicText(instructionText, 
+            !isEnglish 
+            ? "المستوى 1: ادخل التسلسل بنفس الترتيب." 
+            : "Level 1: Enter the sequence in the same order.");
+        break;
+    case 2:
+        sequenceLength = Mathf.Clamp(2 + sequenceInLevel, 2, 10);
+        SetArabicText(instructionText, 
+            !isEnglish 
+            ? "المستوى 2: ادخل التسلسل بالترتيب العكسي." 
+            : "Level 2: Enter the sequence in reverse order.");
+        break;
+    case 3:
+        sequenceLength = Mathf.Clamp(3 + sequenceInLevel, 3, 11);
+        SetArabicText(instructionText, 
+            !isEnglish 
+            ? "المستوى 3: ادخل التسلسل بالترتيب العكسي." 
+            : "Level 3: Enter the sequence in reverse order.");
+        break;
+    case 4:
+        sequenceLength = Mathf.Clamp(4 + sequenceInLevel, 4, 12);
+        SetArabicText(instructionText, 
+            !isEnglish 
+            ? "المستوى 4: ادخل التسلسل بالترتيب العكسي." 
+            : "Level 4: Enter the sequence in reverse order.");
+        break;
+    case 5:
+        sequenceLength = Mathf.Clamp(5 + sequenceInLevel, 5, 13);
+        SetArabicText(instructionText, 
+            !isEnglish 
+            ? "المستوى 5: ادخل التسلسل بالترتيب العكسي." 
+            : "Level 5: Enter the sequence in reverse order.");
+        break;
+    default:
+        sequenceLength = Mathf.Clamp(5 + (currentLevel - 1), 5, 13);
+        SetArabicText(instructionText, 
+            !isEnglish 
+            ? $"المستوى {currentLevel}: ادخل التسلسل بالترتيب العكسي." 
+            : $"Level {currentLevel}: Enter the sequence in reverse order.");
+        break;
+}
+
 
         UpdateLevelUI();
         GenerateNewSequence();
@@ -144,8 +215,17 @@ public class DigitMemoryGame : MonoBehaviour
 
     void UpdateLevelUI()
     {
-        currentLevelText.text = "Current Level: " + currentLevel;
-        currentSequenceText.text = "Current Sequence: " + sequenceInLevel+"/"+SequencePerLevel;
+        // currentLevelText.text = "Current Level: " + currentLevel;
+        // currentSequenceText.text = "Current Sequence: " + sequenceInLevel+"/"+SequencePerLevel;
+        SetArabicText(currentLevelText, 
+    !isEnglish 
+    ? ("المستوى: " + currentLevel) 
+    : ($"{currentLevel} : Current Level "));
+    SetArabicText(currentSequenceText,  
+    !isEnglish 
+    ? $"التسلسل الحالي: {sequenceInLevel}/{SequencePerLevel}." 
+    : $"{sequenceInLevel}/{SequencePerLevel} : Current Sequence ");
+
     }
 
     void GenerateNewSequence()
@@ -175,7 +255,13 @@ public class DigitMemoryGame : MonoBehaviour
         sequenceLength = Mathf.Clamp(5 + sequenceInLevel, 5, 13);
     }
 
-    instructionText.text = (currentLevel == 1) ? "Memorize the sequence." : "Enter the sequence in reverse order.";
+    // instructionText.text = (currentLevel == 1) ? "اجفظ التسلسل" : "Enter the sequence in reverse order.";
+    // instructionText.GetComponent<ArabicFixerTMPRO>().fixedText = (currentLevel == 1) ? "احفظ التسلسل" : "Enter the sequence in reverse order.";
+   SetArabicText(instructionText, 
+    (!isEnglish) 
+    ? ((currentLevel == 1) ? "احفظ التسلسل" : "احفظ التسلسل العكسي") 
+    : "Memorize the sequence");
+
 
     int previousNumber = -1; // Initialize to a value that cannot occur (digits are 0-9)
 
@@ -213,7 +299,14 @@ public class DigitMemoryGame : MonoBehaviour
         }
 
         displayText.text = "";
-        instructionText.text = (currentLevel == 1) ? "Enter the sequence." : "Enter the sequence in reverse order.";
+        SetArabicText(instructionText, 
+    !isEnglish 
+    ? (currentLevel == 1 ? "ادخل التسلسل" : "ادخل التسلسل العكسي") 
+    : (currentLevel == 1 ? "Enter the sequence" : "Enter the sequence in reverse order"));
+
+
+        // instructionText.GetComponent<ArabicFixerTMPRO>().fixedText = (currentLevel == 1) ? "ادخل التسلسل" : "Enter the sequence in reverse order.";
+        // instructionText.text = (currentLevel == 1) ? "ادخل التسلسل" : "Enter the sequence in reverse order.";
         answerInput.interactable = true; // Enable the input field
     }
 
@@ -255,24 +348,37 @@ public class DigitMemoryGame : MonoBehaviour
     void HandleCorrectResponse()
     {
         switch (currentAttempt)
-        {
-            case 0:
-                firstAttemptScore++;
-                firstAttemptScoreText.text = "First Attempt Score: " + firstAttemptScore;
-                break;
-            case 1:
-                secondAttemptScore++;
-                secondAttemptScoreText.text = "Second Attempt Score: " + secondAttemptScore;
-                break;
-            case 2:
-                thirdAttemptScore++;
-                thirdAttemptScoreText.text = "Third Attempt Score: " + thirdAttemptScore;
-                break;
-            case 3:
-                fourthAttemptScore++;
-                fourthAttemptScoreText.text = "Fourth Attempt Score: " + fourthAttemptScore;
-                break;
-        }
+{
+    case 0:
+        firstAttemptScore++;
+        SetArabicText(firstAttemptScoreText, 
+            !isEnglish 
+            ? $"المحاولة الأولى: {firstAttemptScore}" 
+            : $"{firstAttemptScore}: First Attempt Score");
+        break;
+    case 1:
+        secondAttemptScore++;
+        SetArabicText(secondAttemptScoreText, 
+            !isEnglish 
+            ? $"المحاولة الثانية: {secondAttemptScore}" 
+            : $"{secondAttemptScore}:  Second Attempt Score");
+        break;
+    case 2:
+        thirdAttemptScore++;
+        SetArabicText(thirdAttemptScoreText, 
+            !isEnglish 
+            ? $"المحاولة الثالثة: {thirdAttemptScore}" 
+            : $" {thirdAttemptScore}: Third Attempt Score");
+        break;
+    case 3:
+        fourthAttemptScore++;
+        SetArabicText(fourthAttemptScoreText, 
+            !isEnglish 
+            ? $"المحاولة الرابعة: {fourthAttemptScore}" 
+            : $"{fourthAttemptScore}: Fourth Attempt Score");
+        break;
+}
+
 
         // Increment the total correct responses
         totalCorrectResponses++;
@@ -311,7 +417,12 @@ public class DigitMemoryGame : MonoBehaviour
 
     if (currentAttempt < maxAttempts)
     {
-        instructionText.text = $"Attempt {currentAttempt + 1} failed. Try again.";
+        SetArabicText(instructionText, 
+    !isEnglish 
+    ? $"المحاولة {currentAttempt + 1} فشلت. حاول مرة أخرى." 
+    : $"Attempt {currentAttempt + 1} failed. Try again.");
+
+
         StartCoroutine(DisplaySequence());
     }
     else
@@ -322,13 +433,22 @@ public class DigitMemoryGame : MonoBehaviour
         if (failedSequences >= 2)
         {
             // End the game if the user fails four attempts twice in a row
-            instructionText.text = "Game Over: Too many failed attempts.";
+           SetArabicText(instructionText, 
+    !isEnglish 
+    ? "انتهت اللعبة: الكثير من المحاولات الفاشلة." 
+    : "Game Over: Too many failed attempts.");
+
             EndGame();
             return;
         }
         else
         {
-            instructionText.text = "Maximum attempts reached. Moving to next sequence.";
+            SetArabicText(instructionText, 
+    !isEnglish  
+    ? "تم الوصول إلى الحد الأقصى من المحاولات. الانتقال إلى التسلسل التالي." 
+    : "Maximum attempts reached. Moving to next sequence.");
+
+
             sequenceInLevel++;
             currentAttempt = 0;
 
@@ -355,17 +475,24 @@ public class DigitMemoryGame : MonoBehaviour
 
 IEnumerator WaitAndGenerateNewSequence()
 {
-    instructionText.text = $"Next sequence in {timeBetwenQ} seconds...";
+    SetArabicText(instructionText, !isEnglish 
+        ? $"التسلسل التالي في {timeBetwenQ} ثواني..."
+        : $"Next sequence in {timeBetwenQ} seconds...");
+
     yield return new WaitForSeconds(timeBetwenQ);  // Wait for 3 seconds
     GenerateNewSequence();
 }
 
 IEnumerator WaitAndStartNewLevel()
 {
-    instructionText.text = $"Level " + currentLevel + " starting in {timeBetwenLvl} seconds...";
+    SetArabicText(instructionText, !isEnglish 
+        ? $"المستوى {currentLevel} سيبدأ في {timeBetwenLvl} ثواني..."
+        : $"Level {currentLevel} starting in {timeBetwenLvl} seconds...");
+
     yield return new WaitForSeconds(timeBetwenLvl);  // Wait for 3 seconds
     StartNewLevel();
 }
+
 
 // IEnumerator WaitAndEnableInput()
 // {
@@ -374,13 +501,22 @@ IEnumerator WaitAndStartNewLevel()
 //     answerInput.interactable = true; // Enable input field again
 // }
 
-    void EndGame()
-    {
-        resultsPanel.SetActive(true);
-        TaskUI.SetActive(false);
-        longestSequenceText.text = "Longest Sequence: " + longestSequence;
-        totalCorrectResponsesText.text = "Total Correct Responses: " + totalCorrectResponses;
-    }
+   void EndGame()
+{
+    resultsPanel.SetActive(true);
+    TaskUI.SetActive(false);
+    
+    SetArabicText(longestSequenceText, 
+        !isEnglish 
+        ? $"أطول تسلسل: {longestSequence}" 
+        : $"Longest Sequence: {longestSequence}");
+    
+    SetArabicText(totalCorrectResponsesText, 
+        !isEnglish 
+        ? $"إجمالي الإجابات الصحيحة: {totalCorrectResponses}" 
+        : $"Total Correct Responses: {totalCorrectResponses}");
+}
+
 
     void PlaySound(AudioClip clip)
     {

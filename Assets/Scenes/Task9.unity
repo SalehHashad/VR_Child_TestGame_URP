@@ -9228,6 +9228,26 @@ MonoBehaviour:
   instructionAudio: {fileID: 636605150}
   arabicClip: {fileID: 8300000, guid: a5ba42034707b5b46bf94eddbc79e4cf, type: 3}
   englishClip: {fileID: 8300000, guid: 91ef490d037472748ac49e775716da76, type: 3}
+  OnAudioFinished:
+    m_PersistentCalls:
+      m_Calls: []
+  OnLanguageChanged:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1703385114}
+        m_TargetAssemblyTypeName: MemoryRecallGame, Assembly-CSharp
+        m_MethodName: SetLanguage
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  englishInstruction: []
+  arabicInstruction: []
 --- !u!4 &636605152
 Transform:
   m_ObjectHideFlags: 0
@@ -27654,6 +27674,7 @@ MonoBehaviour:
   incorrectSound: {fileID: 8300000, guid: 6a5b229a20dcba14b905cec58ecbc96b, type: 3}
   taskUI: {fileID: 25103267}
   onboardingUI: {fileID: 631568286}
+  isEnglish: 1
 --- !u!1001 &1714741047
 PrefabInstance:
   m_ObjectHideFlags: 0

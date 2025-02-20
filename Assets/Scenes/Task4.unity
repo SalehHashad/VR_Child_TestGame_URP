@@ -190,6 +190,7 @@ MonoBehaviour:
   audioSource: {fileID: 780895896}
   correctResponseSound: {fileID: 8300000, guid: b6dd0516ecc6ef8498899b0ded2d2111, type: 3}
   commissionErrorSound: {fileID: 8300000, guid: 023c41fcc35ddbe4783f372dd66d0e23, type: 3}
+  isEnglish: 1
 --- !u!1001 &4711605
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -17065,6 +17066,24 @@ MonoBehaviour:
   instructionAudio: {fileID: 988305241}
   arabicClip: {fileID: 8300000, guid: 7adf3c368fa945846b9935ce1ad94d56, type: 3}
   englishClip: {fileID: 8300000, guid: e455ed8a50743ca48baf6df5103beaee, type: 3}
+  OnAudioFinished:
+    m_PersistentCalls:
+      m_Calls: []
+  OnLanguageChanged:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1803074}
+        m_TargetAssemblyTypeName: NumberPresentation, Assembly-CSharp
+        m_MethodName: SetLanguage
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   englishInstruction: []
   arabicInstruction: []
 --- !u!4 &988305243
