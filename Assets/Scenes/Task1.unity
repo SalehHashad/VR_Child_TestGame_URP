@@ -829,12 +829,52 @@ MonoBehaviour:
   instructionAudio: {fileID: 24608420}
   arabicClip: {fileID: 8300000, guid: 3d966a10dad5e5e43a1a198c2b69b8da, type: 3}
   englishClip: {fileID: 8300000, guid: 2ab88c8a9a412ca4880b3fa06bbcac3a, type: 3}
+  OnAudioFinished:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1748937066}
+        m_TargetAssemblyTypeName: Task1, Assembly-CSharp
+        m_MethodName: StartTask
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  OnLanguageChanged:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1748937066}
+        m_TargetAssemblyTypeName: Task1, Assembly-CSharp
+        m_MethodName: SetLanguage
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1703385114}
+        m_TargetAssemblyTypeName: Task1, Assembly-CSharp
+        m_MethodName: SetLanguage
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   englishInstruction:
-  - {fileID: 1463379848}
   - {fileID: 1294932536}
   - {fileID: 1883252655}
   arabicInstruction:
-  - {fileID: 58801333}
   - {fileID: 923283850}
   - {fileID: 385890675}
 --- !u!4 &24608422
@@ -4335,7 +4375,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8330877019196067990, guid: 7feb1b28cb8ef48bebc956da8dbe9e25, type: 3}
   m_PrefabInstance: {fileID: 1463379847}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1463379848}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
@@ -11784,7 +11824,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8330877019196067990, guid: 7feb1b28cb8ef48bebc956da8dbe9e25, type: 3}
       propertyPath: m_text
-      value: Determine the direction for objects spawned at the center
+      value: ' '
       objectReference: {fileID: 0}
     - target: {fileID: 8330877019196067990, guid: 7feb1b28cb8ef48bebc956da8dbe9e25, type: 3}
       propertyPath: m_fontSize
@@ -11874,11 +11914,6 @@ PrefabInstance:
       addedObject: {fileID: 58801334}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7feb1b28cb8ef48bebc956da8dbe9e25, type: 3}
---- !u!1 &1463379848 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 7950900465869875365, guid: 7feb1b28cb8ef48bebc956da8dbe9e25, type: 3}
-  m_PrefabInstance: {fileID: 1463379847}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1468823181
 GameObject:
   m_ObjectHideFlags: 0
@@ -14304,6 +14339,9 @@ MonoBehaviour:
   - {fileID: 3070188858839806152, guid: 7e478015312721741a6ba044760cbe3e, type: 3}
   - {fileID: 7684946407787254695, guid: 5e8d5e20d64268247b68373bc225a9eb, type: 3}
   - {fileID: 7684946407787254695, guid: 5e8d5e20d64268247b68373bc225a9eb, type: 3}
+  trialEnd:
+    m_PersistentCalls:
+      m_Calls: []
   rightButton: {fileID: 2138401119}
   leftButton: {fileID: 619021091}
   spawnPoint: {fileID: 8874080601288573930}
@@ -14318,9 +14356,11 @@ MonoBehaviour:
   targetOffset: 2
   correctAnswerClip: {fileID: 8300000, guid: 17159cf7a9558de469b30ffc0047da70, type: 3}
   wrongAnswerClip: {fileID: 8300000, guid: 6a5b229a20dcba14b905cec58ecbc96b, type: 3}
+  trialEndClip: {fileID: 8300000, guid: 78155604c52527942b5b429658f1c5d1, type: 3}
   maxTotalErrors: 4
   maxConsecutiveErrors: 2
   resultUI: {fileID: 1188064219}
+  isEnglish: 1
 --- !u!224 &1717836438 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 1801148039425419352, guid: b73d64b0c02b0eb42bb7453e3af51766, type: 3}
@@ -14331,6 +14371,98 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 22458684, guid: c4e389e44d96da64ea974ab237ce1a9a, type: 3}
   m_PrefabInstance: {fileID: 1112584188}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1748937064
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1748937065}
+  - component: {fileID: 1748937066}
+  m_Layer: 0
+  m_Name: task1 trial
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1748937065
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1748937064}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1894151522}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1748937066
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1748937064}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb726349533ec4444b191fb930509ba1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fixationPoint: {fileID: 7613241928157687668}
+  cuePrefab: {fileID: 8583738099466383536, guid: 0a15ec883fd66b844960e13835ec712f, type: 3}
+  levelText: {fileID: 553715807}
+  questionCounterText: {fileID: 530012827}
+  feedbackText: {fileID: 544258614}
+  orientingText: {fileID: 147794024}
+  executiveControlText: {fileID: 1930942282}
+  alertingText: {fileID: 18085317}
+  arrowPrefabs:
+  - {fileID: 6020249798918786406, guid: 21a944fb1235d3e4b95197b4c53d3236, type: 3}
+  - {fileID: 2973501102365436684, guid: 0ed4da71e3f3b8a458eb1810c5f0a28f, type: 3}
+  - {fileID: 3070188858839806152, guid: 7e478015312721741a6ba044760cbe3e, type: 3}
+  - {fileID: 7684946407787254695, guid: 5e8d5e20d64268247b68373bc225a9eb, type: 3}
+  - {fileID: 7684946407787254695, guid: 5e8d5e20d64268247b68373bc225a9eb, type: 3}
+  trialEnd:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1703385114}
+        m_TargetAssemblyTypeName: Task1, Assembly-CSharp
+        m_MethodName: mainTaskStart
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  rightButton: {fileID: 2138401119}
+  leftButton: {fileID: 619021091}
+  spawnPoint: {fileID: 8874080601288573930}
+  fixationTimeMin: 0.55
+  fixationTimeMax: 2
+  cueTime: 1
+  interTrialIntervalMax: 3
+  interTrialIntervalMin: 1
+  totalQuestions: 5
+  arrowOffset: 2.5
+  cueOffset: 2
+  targetOffset: 2
+  correctAnswerClip: {fileID: 8300000, guid: 17159cf7a9558de469b30ffc0047da70, type: 3}
+  wrongAnswerClip: {fileID: 8300000, guid: 6a5b229a20dcba14b905cec58ecbc96b, type: 3}
+  trialEndClip: {fileID: 8300000, guid: 78155604c52527942b5b429658f1c5d1, type: 3}
+  maxTotalErrors: 4
+  maxConsecutiveErrors: 2
+  resultUI: {fileID: 1703385112}
+  isEnglish: 1
 --- !u!1 &1761475674
 GameObject:
   m_ObjectHideFlags: 0
@@ -16071,7 +16203,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1894151522
 Transform:
   m_ObjectHideFlags: 0
@@ -16086,6 +16218,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1703385113}
+  - {fileID: 1748937065}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1911557155

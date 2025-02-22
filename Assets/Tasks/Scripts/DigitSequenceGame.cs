@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using UnityEngine.Events;
 
 public class DigitSequenceGame : MonoBehaviour
 {
@@ -20,16 +21,21 @@ public class DigitSequenceGame : MonoBehaviour
     public TextMeshProUGUI accuracyRateText;
     public AudioClip correctSound;
     public AudioClip incorrectSound;
+    public AudioClip trialEndClip;
     private AudioSource audioSource;
 
 public GameObject TaskUI;
 public GameObject OnboardingUI;
 public GameObject resultsUI;
     [Header("Level Configurations")]
+    // [SerializeField] private int MAXLevel=1; // Panel UI
     public float[] displayTimePerLevel = { 5.0f, 4.5f, 4.0f, 3.5f, 3.0f };
     public int[] minDigitsPerLevel = { 3, 4, 5, 6, 7 };
     public int[] maxDigitsPerLevel = { 10, 11, 12, 13, 14 };
     public Color[] digitColorsPerLevel = { Color.blue, Color.green, Color.yellow, Color.magenta, Color.red };
+
+    [Header(" Events")]
+    public UnityEvent trialEnd;
 
     private List<int> digitSequence = new List<int>();
     private int sequenceLength = 3;
@@ -40,12 +46,15 @@ public GameObject resultsUI;
     private int currentLevel = 0; // Start at level 0, which is Level 1 for user
     private int questionCount = 0;
     public int maxQuestionsPerLevel = 50;
-    private const int maxLevels = 5;
+    public int maxLevels = 5;
 private float totalResponseTime = 0f;
 private int correctResponses = 0;
 private int totalQuestions = 0;
 private int consecutiveWrong = 0;
 public int maxconsecutiveWrong = 4;
+
+private bool isTaskActive = true; // Variable to track task state
+// public int trialLevel = 1;
 
 public bool isEnglish = true; // Default to English
 
@@ -55,9 +64,48 @@ public bool isEnglish = true; // Default to English
          Debug.Log("isEnglish>: " + isEnglish); // Debugging purpose
          
     }
-    void Start()
+    public void mainTaskStart()
+{
+    if (audioSource == null)
     {
-        audioSource = GetComponent<AudioSource>();
+        audioSource = gameObject.AddComponent<AudioSource>();
+    }
+
+    if (trialEndClip == null)
+    {
+        Debug.LogError("trialEndClip is null! Assign it in the inspector.");
+        StartTask(); // Skip audio and proceed
+        return;
+    }
+
+    // Play the audio
+    PlaySound(trialEndClip);
+
+    // Start a coroutine to wait until the audio finishes
+    StartCoroutine(WaitForAudioToFinish());
+}
+
+
+    private IEnumerator WaitForAudioToFinish()
+{
+    if (audioSource == null || audioSource.clip == null)
+    {
+        Debug.LogError("AudioSource or AudioClip is null. Skipping wait.");
+        StartTask(); // Ensure the next step continues even if no audio is present
+        yield break;
+    }
+
+    yield return new WaitForSeconds(audioSource.clip.length);
+
+    StartTask();
+}
+
+    public void StartTask()
+    {
+        if(audioSource==null){
+audioSource = gameObject.AddComponent<AudioSource>();
+        }
+        
         rightButton.onClick.AddListener(OnRightButtonClicked);
         wrongButton.onClick.AddListener(OnWrongButtonClicked);
         AddArabicFixerToAllText();
@@ -103,6 +151,7 @@ public bool isEnglish = true; // Default to English
 
     private void StartNewSequence()
     {
+        if (!isTaskActive) return; // Stop if task is inactive
          SetArabicText(rightButtonText, 
         !isEnglish 
         ? "نعم" 
@@ -194,12 +243,14 @@ SetArabicText(scoreText,
 
     private void OnRightButtonClicked()
     {
+        if (!isTaskActive) return; // Stop if task is inactive
         RecordResponseTime();
         CheckAnswer(true);
     }
 
     private void OnWrongButtonClicked()
     {
+        if (!isTaskActive) return; // Stop if task is inactive
         RecordResponseTime();
         CheckAnswer(false);
     }
@@ -272,10 +323,14 @@ if(consecutiveWrong==maxconsecutiveWrong)
     
     private void LevelUp()
 {
+    //  if(currentLevel>trialLevel){
+    //         DisplayResults(); // Call DisplayResults when all levels are completed
+    //     }
     if (currentLevel < maxLevels - 1)
     {
         currentLevel++;
         questionCount = 0;
+       
         SetArabicText(instructionText, 
     !isEnglish 
     ? $"المستوى {currentLevel + 1}!" // Arabic for Level
@@ -289,20 +344,19 @@ if(consecutiveWrong==maxconsecutiveWrong)
     }
 }
 
-    private void PlaySound(AudioClip clip)
+    void PlaySound(AudioClip clip)
     {
-        if (audioSource != null && clip != null)
-        {
-            audioSource.PlayOneShot(clip);
-        }
+        audioSource.clip = clip;
+        audioSource.Play();
     }
     private void DisplayResults()
 {
     TaskUI.SetActive(false);
     resultsUI.SetActive(true);
+    isTaskActive=false;
     float averageResponseTime = totalResponseTime / totalQuestions;
     float accuracyRate = (float)correctResponses / totalQuestions * 100f;
-
+trialEnd?.Invoke();
     // Display results in the UI
   SetArabicText(instructionText, 
     !isEnglish 

@@ -1,6 +1,8 @@
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using UnityEngine.Events;
+using System.Collections; 
 
 public class Task8 : MonoBehaviour
 {
@@ -17,6 +19,9 @@ public class Task8 : MonoBehaviour
     public GameObject diamondPrefab;               // Diamond shape prefab for odd/even
     public GameObject squarePrefab;                // Square shape prefab for greater/less
     public int questionPerLevel = 50;              // Number of questions before level up
+    public int MaxLevel = 1;              // Number of questions before level up
+[Header(" Events")]
+    public UnityEvent trialEnd;
 
     private GameObject currentShapeInstance;       // Holds the current shape instance
     private int currentLevel = 1;
@@ -34,6 +39,7 @@ public class Task8 : MonoBehaviour
     public AudioClip correctSound;   // Sound for correct answer
     public AudioClip wrongSound;     // Sound for wrong answer
     private AudioSource audioSource; // AudioSource to play sounds
+    [SerializeField] private AudioClip trialEndClip;
 
     // Task End Flag
     private bool isTaskEnd = false;
@@ -41,7 +47,41 @@ public class Task8 : MonoBehaviour
     public int maxConsecutiveWrong = 4;
 
     public bool isEnglish = true; // Default to English
+    public void mainTaskStart()
+{
+    if (audioSource == null)
+    {
+        audioSource = gameObject.AddComponent<AudioSource>();
+    }
 
+    if (trialEndClip == null)
+    {
+        Debug.LogError("trialEndClip is null! Assign it in the inspector.");
+        StartTask();
+        return;
+    }
+
+    // Play the audio
+    PlaySound(trialEndClip);
+
+    // Start a coroutine to wait until the audio finishes
+    StartCoroutine(WaitForAudioToFinish());
+}
+
+
+    private IEnumerator WaitForAudioToFinish()
+{
+    if (audioSource == null || audioSource.clip == null)
+    {
+        Debug.LogError("AudioSource or AudioClip is null. Skipping wait.");
+        StartTask(); // Ensure the next step continues even if no audio is present
+        yield break;
+    }
+
+    yield return new WaitForSeconds(audioSource.clip.length);
+
+    StartTask();
+}
     public void SetLanguage()
     {
         isEnglish = false;
@@ -79,7 +119,7 @@ public class Task8 : MonoBehaviour
     }
 }
 
-    void Start()
+    public void StartTask()
     {
         // Get the AudioSource component from the same GameObject
         audioSource = GetComponent<AudioSource>();
@@ -88,13 +128,20 @@ public class Task8 : MonoBehaviour
         SetupLevel(currentLevel);
         leftButton.onClick.AddListener(() => HandleButtonClick(true));
         rightButton.onClick.AddListener(() => HandleButtonClick(false));
+        // able buttons
+        leftButton.interactable = true;
+        rightButton.interactable = true;
         UpdateUI();
     }
 
     void SetupLevel(int level)
     {
         if (isTaskEnd) return; // Don't set up a new task if the task is already ended
+        if(level>MaxLevel){
+            EndTask();
+            return;
 
+        }
         maxRange = GetMaxRangeForLevel(level);
         // number = Random.Range(0, maxRange + 1);
         int restrictedValue = Mathf.CeilToInt(maxRange / 2f);
@@ -234,7 +281,11 @@ SetArabicText(rightButtonText, isEnglish ? "LOW" : "أقل");
         // Load the next question and check for level up
         LoadNextQuestion();
     }
-
+void PlaySound(AudioClip clip)
+    {
+        audioSource.clip = clip;
+        audioSource.Play();
+    }
     void LoadNextQuestion()
     {
         // Check if the current level's question limit has been reached
@@ -268,15 +319,20 @@ SetArabicText(rightButtonText, isEnglish ? "LOW" : "أقل");
         // Display task end message if desired (optional)
         SetArabicText(questionText, isEnglish ? "Task Ended!" : "انتهت المهمة!");
 
+        trialEnd?.Invoke();
+
 
     }
 
     void UpdateUI()
     {
         // Update the displayed score, level, and question count
-        scoreText.text = isEnglish ? $"Score: {score}" : $"النتيجة: {score}";
-levelText.text = isEnglish ? $"Level: {currentLevel}" : $"المستوى: {currentLevel}";
-currentQuestionText.text = isEnglish ? $"Question: {questionCount}/{questionPerLevel}" : $"السؤال: {questionCount}/{questionPerLevel}";
+        SetArabicText(scoreText, isEnglish ? $"Score: {score}" : $"النتيجة: {score}");
+ SetArabicText(levelText,isEnglish ? $"Level: {currentLevel}" : $"المستوى: {currentLevel}");
+ SetArabicText(currentQuestionText, isEnglish ? $"Question: {questionCount}/{questionPerLevel}" : $"السؤال: {questionCount}/{questionPerLevel}");
+//         scoreText.text = isEnglish ? $"Score: {score}" : $"النتيجة: {score}";
+// levelText.text = isEnglish ? $"Level: {currentLevel}" : $"المستوى: {currentLevel}";
+// currentQuestionText.text = isEnglish ? $"Question: {questionCount}/{questionPerLevel}" : $"السؤال: {questionCount}/{questionPerLevel}";
 
     }
 

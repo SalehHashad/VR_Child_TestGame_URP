@@ -355,6 +355,125 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1ee30cbe8d456154fb813c6f00ea26a1, type: 3}
+--- !u!1 &64352911
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 64352912}
+  - component: {fileID: 64352913}
+  m_Layer: 0
+  m_Name: DigitSequenceGame trial
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &64352912
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 64352911}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1894151522}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &64352913
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 64352911}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2398b9226b501634eb6b0447bba7c38c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  digitText: {fileID: 1020272276}
+  instructionText: {fileID: 411643548}
+  rightButton: {fileID: 1228825878}
+  wrongButton: {fileID: 1656474337}
+  rightButtonText: {fileID: 1281083992}
+  wrongButtonText: {fileID: 379437292}
+  scoreText: {fileID: 553715807}
+  levelText: {fileID: 530012827}
+  questionText: {fileID: 1685863584}
+  responseTimeText: {fileID: 1468823183}
+  AvergeResponseTimeText: {fileID: 759447257}
+  accuracyRateText: {fileID: 2060647235}
+  correctSound: {fileID: 8300000, guid: 17159cf7a9558de469b30ffc0047da70, type: 3}
+  incorrectSound: {fileID: 8300000, guid: 6a5b229a20dcba14b905cec58ecbc96b, type: 3}
+  trialEndClip: {fileID: 8300000, guid: 78155604c52527942b5b429658f1c5d1, type: 3}
+  TaskUI: {fileID: 25103267}
+  OnboardingUI: {fileID: 1938594223}
+  resultsUI: {fileID: 1703385112}
+  displayTimePerLevel:
+  - 2
+  - 1.5
+  - 1
+  - 0.5
+  - 0.25
+  minDigitsPerLevel: 0300000004000000050000000600000007000000
+  maxDigitsPerLevel: 0a0000000b0000000c0000000d0000000e000000
+  digitColorsPerLevel:
+  - {r: 0, g: 0, b: 1, a: 1}
+  - {r: 0, g: 1, b: 0, a: 1}
+  - {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  - {r: 1, g: 0, b: 1, a: 1}
+  - {r: 1, g: 0, b: 0, a: 1}
+  trialEnd:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1703385112}
+        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+        m_MethodName: SetActive
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
+      - m_Target: {fileID: 1703385114}
+        m_TargetAssemblyTypeName: DigitSequenceGame, Assembly-CSharp
+        m_MethodName: mainTaskStart
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
+      - m_Target: {fileID: 64352911}
+        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+        m_MethodName: SetActive
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  maxQuestionsPerLevel: 3
+  maxLevels: 1
+  maxconsecutiveWrong: 5
+  isEnglish: 1
 --- !u!1 &65337869
 GameObject:
   m_ObjectHideFlags: 0
@@ -2929,6 +3048,37 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 1040356976413935379, guid: 7feb1b28cb8ef48bebc956da8dbe9e25, type: 3}
   m_PrefabInstance: {fileID: 1603239492}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &543050932
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 543050933}
+  m_Layer: 0
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &543050933
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 543050932}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.014508486, y: 1.3473167, z: 1.674273}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &545089258
 GameObject:
   m_ObjectHideFlags: 0
@@ -11772,7 +11922,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1703385113
 Transform:
   m_ObjectHideFlags: 0
@@ -11814,6 +11964,7 @@ MonoBehaviour:
   accuracyRateText: {fileID: 2060647235}
   correctSound: {fileID: 8300000, guid: 17159cf7a9558de469b30ffc0047da70, type: 3}
   incorrectSound: {fileID: 8300000, guid: 6a5b229a20dcba14b905cec58ecbc96b, type: 3}
+  trialEndClip: {fileID: 8300000, guid: 78155604c52527942b5b429658f1c5d1, type: 3}
   TaskUI: {fileID: 25103267}
   OnboardingUI: {fileID: 1938594223}
   resultsUI: {fileID: 1613042261}
@@ -11831,7 +11982,11 @@ MonoBehaviour:
   - {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   - {r: 1, g: 0, b: 1, a: 1}
   - {r: 1, g: 0, b: 0, a: 1}
+  trialEnd:
+    m_PersistentCalls:
+      m_Calls: []
   maxQuestionsPerLevel: 20
+  maxLevels: 5
   maxconsecutiveWrong: 5
   isEnglish: 1
 --- !u!224 &1717836438 stripped
@@ -13142,7 +13297,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1894151522
 Transform:
   m_ObjectHideFlags: 0
@@ -13157,6 +13312,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1703385113}
+  - {fileID: 64352912}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1908136842
@@ -14132,7 +14288,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9ca391f2d781b644d8d05495f92524b6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  task: {fileID: 1894151521}
+  task: {fileID: 543050932}
   timeToStart: 35
   instructionCanvus: {fileID: 1934572688}
   instructionAudio: {fileID: 2045926830}
@@ -14140,11 +14296,47 @@ MonoBehaviour:
   englishClip: {fileID: 8300000, guid: d174b1051d20a9a49911eafff48c6b52, type: 3}
   OnAudioFinished:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 64352911}
+        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+        m_MethodName: SetActive
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
+      - m_Target: {fileID: 64352913}
+        m_TargetAssemblyTypeName: DigitSequenceGame, Assembly-CSharp
+        m_MethodName: StartTask
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
   OnLanguageChanged:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1703385114}
+        m_TargetAssemblyTypeName: DigitSequenceGame, Assembly-CSharp
+        m_MethodName: SetLanguage
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 64352913}
         m_TargetAssemblyTypeName: DigitSequenceGame, Assembly-CSharp
         m_MethodName: SetLanguage
         m_Mode: 1
@@ -15169,3 +15361,4 @@ SceneRoots:
   - {fileID: 2045926832}
   - {fileID: 715958597}
   - {fileID: 1934572693}
+  - {fileID: 543050933}

@@ -23325,6 +23325,181 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 5830269586382293712, guid: beddf7edee72b2347b7987b139a88204, type: 3}
   m_PrefabInstance: {fileID: 1323516060}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1328022250
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1328022251}
+  - component: {fileID: 1328022253}
+  - component: {fileID: 1328022252}
+  m_Layer: 0
+  m_Name: task8 trial
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1328022251
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1328022250}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1894151522}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!82 &1328022252
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1328022250}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_PlayOnAwake: 1
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!114 &1328022253
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1328022250}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 127d4e7c0baa1c44f87302d75276aa4f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  questionText: {fileID: 544258614}
+  scoreText: {fileID: 553715807}
+  levelText: {fileID: 530012827}
+  currentQuestionText: {fileID: 1468823183}
+  currentNumberText: {fileID: 1685863584}
+  leftButton: {fileID: 1623422527}
+  rightButton: {fileID: 1656474337}
+  leftButtonText: {fileID: 1778185986}
+  rightButtonText: {fileID: 619632348}
+  spawnPoint: {fileID: 920765222}
+  diamondPrefab: {fileID: 497607471463717624, guid: 21bf692009a70914d8e3501c6495ca51, type: 3}
+  squarePrefab: {fileID: 2905976839670682527, guid: ea40a2aa667f541479e3b374a8538fe8, type: 3}
+  questionPerLevel: 5
+  MaxLevel: 1
+  trialEnd:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1703385114}
+        m_TargetAssemblyTypeName: Task8, Assembly-CSharp
+        m_MethodName: mainTaskStart
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  correctSound: {fileID: 8300000, guid: 17159cf7a9558de469b30ffc0047da70, type: 3}
+  wrongSound: {fileID: 8300000, guid: 6a5b229a20dcba14b905cec58ecbc96b, type: 3}
+  trialEndClip: {fileID: 8300000, guid: 78155604c52527942b5b429658f1c5d1, type: 3}
+  maxConsecutiveWrong: 4
+  isEnglish: 1
 --- !u!1001 &1365142728
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -29302,11 +29477,35 @@ MonoBehaviour:
   englishClip: {fileID: 8300000, guid: b68ee520af3803f45ae1225e55cecc2f, type: 3}
   OnAudioFinished:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1328022253}
+        m_TargetAssemblyTypeName: Task8, Assembly-CSharp
+        m_MethodName: StartTask
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   OnLanguageChanged:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1703385114}
+        m_TargetAssemblyTypeName: Task8, Assembly-CSharp
+        m_MethodName: SetLanguage
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1328022253}
         m_TargetAssemblyTypeName: Task8, Assembly-CSharp
         m_MethodName: SetLanguage
         m_Mode: 1
@@ -29904,8 +30103,13 @@ MonoBehaviour:
   diamondPrefab: {fileID: 497607471463717624, guid: 21bf692009a70914d8e3501c6495ca51, type: 3}
   squarePrefab: {fileID: 2905976839670682527, guid: ea40a2aa667f541479e3b374a8538fe8, type: 3}
   questionPerLevel: 20
+  MaxLevel: 5
+  trialEnd:
+    m_PersistentCalls:
+      m_Calls: []
   correctSound: {fileID: 8300000, guid: 17159cf7a9558de469b30ffc0047da70, type: 3}
   wrongSound: {fileID: 8300000, guid: 6a5b229a20dcba14b905cec58ecbc96b, type: 3}
+  trialEndClip: {fileID: 8300000, guid: 78155604c52527942b5b429658f1c5d1, type: 3}
   maxConsecutiveWrong: 4
   isEnglish: 1
 --- !u!82 &1703385115
@@ -35367,7 +35571,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1894151522
 Transform:
   m_ObjectHideFlags: 0
@@ -35382,6 +35586,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1703385113}
+  - {fileID: 1328022251}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1916389076

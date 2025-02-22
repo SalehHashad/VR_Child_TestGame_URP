@@ -2,6 +2,7 @@ using UnityEngine;
 using TMPro;          // Import TextMesh Pro
 using UnityEngine.UI;
 using System.Collections;
+using UnityEngine.Events;
 
 public class CountingBall : MonoBehaviour
 {
@@ -18,6 +19,7 @@ public class CountingBall : MonoBehaviour
     public AudioSource audioSource; // Single AudioSource for playing sounds
     public AudioClip correctSound;  // AudioClip for correct answers
     public AudioClip wrongSound;    // AudioClip for wrong answers
+    public AudioClip trialEndClip;
 
     public float minX = -7f;
     public float maxX = 7f;
@@ -36,12 +38,50 @@ public class CountingBall : MonoBehaviour
     private int errorCount = 0; 
 
 
+    public int maxLevel = 1;
     public int maxTotalErrors = 4;
     public int questionPerLevel = 20;
     public GameObject keyboard;
     public Transform spawnPoint;
 public bool isEnglish = true; // Default to English
+public UnityEvent trialEnd;
 
+public void mainTaskStart()
+{
+    if (audioSource == null)
+    {
+        audioSource = gameObject.AddComponent<AudioSource>();
+    }
+
+    if (trialEndClip == null)
+    {
+        Debug.LogError("trialEndClip is null! Assign it in the inspector.");
+        StartTheTask();
+        return;
+    }
+    audioSource.clip = trialEndClip;
+    audioSource.Play();
+    // Play the audio
+    // PlaySound(trialEndClip);
+
+    // Start a coroutine to wait until the audio finishes
+    StartCoroutine(WaitForAudioToFinish());
+}
+
+
+    private IEnumerator WaitForAudioToFinish()
+{
+    if (audioSource == null || audioSource.clip == null)
+    {
+        Debug.LogError("AudioSource or AudioClip is null. Skipping wait.");
+        StartTheTask(); // Ensure the next step continues even if no audio is present
+        yield break;
+    }
+
+    yield return new WaitForSeconds(audioSource.clip.length);
+
+    StartTheTask();
+}
     public void SetLanguage()
     {
         isEnglish = false;
@@ -76,9 +116,10 @@ public bool isEnglish = true; // Default to English
             }
         }
     }
-    void Start()
+    public void StartTheTask()
     {
         AddArabicFixerToAllText();
+        submitButton.onClick.RemoveAllListeners();
         submitButton.onClick.AddListener(OnSubmitAnswer);
         UpdateScoreText();
         StartCoroutine(StartTask());
@@ -89,7 +130,17 @@ public bool isEnglish = true; // Default to English
         UpdateScoreText();
         for (int i = 1; i <= 5; i++)
         {
+            submitButton.onClick.RemoveAllListeners();
+        submitButton.onClick.AddListener(OnSubmitAnswer);
             UpdateScoreText();
+
+            if(i>maxLevel){
+                EndTask();
+                // return;
+            }
+            else{
+
+            
             StartLevel(i);
            
             while (questionsRemaining > 0)
@@ -109,6 +160,7 @@ public bool isEnglish = true; // Default to English
                 UpdateQuestionText();
                 yield return new WaitUntil(() => !submitButton.interactable);
                 questionsRemaining--;
+            }
             }
             // Congratulate the player after completing all questions in the level
             SetArabicText(instructionText, isEnglish ? "Congratulations! Level " + currentLevel + " completed!" : "تهانينا! تم إكمال المستوى " + currentLevel + "!");
@@ -251,10 +303,10 @@ void EndTask()
 {
     StopAllCoroutines(); // Stop all coroutines to end the task
     SetArabicText(instructionText, isEnglish ? "Task ended due to too many errors." : "تم إنهاء المهمة بسبب عدد كبير من الأخطاء.");
-
     submitButton.interactable = false;
     ShowKeyboard(false); // Hide the keyboard
     ClearBalls();        // Clear the balls
+    trialEnd?.Invoke();
 }
 
 

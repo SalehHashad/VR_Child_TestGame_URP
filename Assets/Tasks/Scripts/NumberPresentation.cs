@@ -3,6 +3,7 @@ using UnityEngine.InputSystem;
 using TMPro;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.Events;
 
 public class NumberPresentation : MonoBehaviour
 {
@@ -50,6 +51,7 @@ public class NumberPresentation : MonoBehaviour
 
     [Header("Level Progression")]
     [SerializeField] private int digitsPerLevel = 45;
+    [SerializeField] private int MaxLevel = 1;
 
     [Header("Response Input")]
     [SerializeField] private InputActionReference response;
@@ -61,6 +63,10 @@ public class NumberPresentation : MonoBehaviour
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private AudioClip correctResponseSound;
     [SerializeField] private AudioClip commissionErrorSound;
+    public AudioClip trialEndClip;
+
+    [Header(" Events")]
+    public UnityEvent trialEnd;
 
     private float currentInterval;
     private int currentLevel = 1;
@@ -119,7 +125,7 @@ public class NumberPresentation : MonoBehaviour
 
     private void Start()
     {
-        ShowOnboardingUI();
+        // ShowOnboardingUI();
 AddArabicFixerToAllText();
         response.action.Enable();
         response.action.performed += OnResponseAction;
@@ -193,7 +199,41 @@ SetArabicText(levelDisplay,
 
     UpdateDifficulty();
 }
+public void mainTaskStart()
+{
+    if (audioSource == null)
+    {
+        audioSource = gameObject.AddComponent<AudioSource>();
+    }
 
+    if (trialEndClip == null)
+    {
+        Debug.LogError("trialEndClip is null! Assign it in the inspector.");
+        OnStartButtonClicked(); // Skip audio and proceed
+        return;
+    }
+
+    // Play the audio
+    PlaySound(trialEndClip);
+
+    // Start a coroutine to wait until the audio finishes
+    StartCoroutine(WaitForAudioToFinish());
+}
+
+
+    private IEnumerator WaitForAudioToFinish()
+{
+    if (audioSource == null || audioSource.clip == null)
+    {
+        Debug.LogError("AudioSource or AudioClip is null. Skipping wait.");
+        OnStartButtonClicked(); // Ensure the next step continues even if no audio is present
+        yield break;
+    }
+
+    yield return new WaitForSeconds(audioSource.clip.length);
+
+    OnStartButtonClicked();
+}
 
     public void OnStartButtonClicked()
     {
@@ -245,6 +285,10 @@ SetArabicText(levelDisplay,
 
     private void UpdateDifficulty()
     {
+        if(currentLevel>MaxLevel){
+            EndTask();
+            
+        }
         if (totalDigitsShown >= currentLevel * digitsPerLevel)
         {
             currentLevel++;
@@ -255,8 +299,8 @@ SetArabicText(levelDisplay,
     private void EndTask()
     {
         taskActive = false;
-        ShowResultsUI();
-
+        // ShowResultsUI();
+trialEnd?.Invoke();
         float averageResponseTime = correctResponseTimes.Count > 0 ? CalculateAverageResponseTime() : 0.0f;
         float correctResponsePercentage = (totalDigitsShown > 0) ? (float)correctResponseCount / totalDigitsShown * 100 : 0.0f;
 
@@ -335,12 +379,10 @@ private void ChangeNumberColor(Color color)
         return sum / correctResponseTimes.Count;
     }
 
-    private void PlaySound(AudioClip clip)
+    void PlaySound(AudioClip clip)
     {
-        if (audioSource != null && clip != null)
-        {
-            audioSource.PlayOneShot(clip);
-        }
+        audioSource.clip = clip;
+        audioSource.Play();
     }
 
     private void ShowOnboardingUI()
@@ -356,7 +398,7 @@ private void ChangeNumberColor(Color color)
         taskUI.SetActive(true);
     }
 
-    private void ShowResultsUI()
+    public void ShowResultsUI()
     {
         taskUI.SetActive(false);
         resultsUI.SetActive(true);

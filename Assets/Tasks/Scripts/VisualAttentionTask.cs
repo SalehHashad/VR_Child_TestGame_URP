@@ -2,6 +2,7 @@ using UnityEngine;
 using TMPro;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.Events;
 
 public class VisualAttentionTask : MonoBehaviour
 {
@@ -14,6 +15,7 @@ public class VisualAttentionTask : MonoBehaviour
     public int startingObjects = 4; // Initial number of objects
     public float speed = 3f; // Speed of object movement
     public int level = 1; // Current level
+    public int MaxLevel = 1; // Current level
     public int totalwrongError = -10; // Current level
     public int QuestionPerLevel = 20; // Current level
     public float roundTime = 10f; // Timer duration for each round
@@ -23,13 +25,15 @@ public class VisualAttentionTask : MonoBehaviour
     public TextMeshProUGUI  questionText; // TextMeshPro for Current Question
     public TextMeshProUGUI  instructionsText; // TextMeshPro for Instructions
     public TextMeshProUGUI  timerText; // TextMeshPro for Timer
-
+[Header(" Events")]
+    public UnityEvent trialEnd;
+    [SerializeField] private AudioSource audioSource;
     private List<GameObject> objects = new List<GameObject>();
     private float currentTime;
     private bool roundActive = true;
     private int score = 0;
     private int Question = 0;
-
+public AudioClip trialEndClip;
     private int correctTrackingStreak = 0; // To track consecutive correct answers
     private int correctRedObjectsCount = 0; // Count of correctly tracked red objects
     private int totalRedObjects = 0; // Total red objects for the round
@@ -37,7 +41,43 @@ private int consecutiveWrong = 0;
 public int maxconsecutiveWrong = 4;
     private GameObject boundary;
 
-public bool isEnglish = true; // Default to English
+public bool isEnglish = true; // Default to English 
+
+public void mainTaskStart()
+{
+    if (audioSource == null)
+    {
+        audioSource = gameObject.AddComponent<AudioSource>();
+    }
+
+    if (trialEndClip == null)
+    {
+        Debug.LogError("trialEndClip is null! Assign it in the inspector.");
+        StartTask();
+        return;
+    }
+
+    // Play the audio
+    PlaySound(trialEndClip);
+
+    // Start a coroutine to wait until the audio finishes
+    StartCoroutine(WaitForAudioToFinish());
+}
+
+
+    private IEnumerator WaitForAudioToFinish()
+{
+    if (audioSource == null || audioSource.clip == null)
+    {
+        Debug.LogError("AudioSource or AudioClip is null. Skipping wait.");
+        StartTask(); // Ensure the next step continues even if no audio is present
+        yield break;
+    }
+
+    yield return new WaitForSeconds(audioSource.clip.length);
+
+    StartTask();
+}
 
     public void SetLanguage()
     {
@@ -73,7 +113,12 @@ public bool isEnglish = true; // Default to English
             }
         }
     }
-    private void Start()
+    void PlaySound(AudioClip clip)
+    {
+        audioSource.clip = clip;
+        audioSource.Play();
+    }
+    public void StartTask()
     {
         
         boundary = GameObject.Find("Boundary");
@@ -243,8 +288,13 @@ private IEnumerator RevertColorCoroutine(GameObject ball, float delay)
     {
         level++;
         Question = 0;
-        StartLevel(level);
+        if(level>MaxLevel){
+            StartCoroutine(EndTask());
+        }else{
+StartLevel(level);
         SetArabicText(instructionsText, isEnglish ? "Congratulations! Level Up!" : "مبروك! تم رفع المستوى!");
+        }
+        
 
     }
     void UpdateUI()
@@ -310,7 +360,8 @@ private IEnumerator EndTask()
      yield return new WaitForSeconds(2);
     resultUI.SetActive(true);
     taskUI.SetActive(false);
-    
+    ClearObjects();
+    trialEnd?.Invoke();
     // Optionally disable further interactions or reset the game
 }
 

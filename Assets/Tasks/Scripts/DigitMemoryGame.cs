@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using UnityEngine.Events;
 
 public class DigitMemoryGame : MonoBehaviour
 {
@@ -28,6 +29,7 @@ public class DigitMemoryGame : MonoBehaviour
 
     [Header("Game Settings")]
     [SerializeField] private int SequencePerLevel=20; // Panel UI
+    [SerializeField] private int MAXLevel=1; // Panel UI
     [SerializeField] private float timeBetwenLvl=3; // Panel UI
     [SerializeField] private float timeBetwenQ=1; // Panel UI
     [SerializeField] private float timeBetwenDigit=2; // Panel UI
@@ -35,7 +37,10 @@ public class DigitMemoryGame : MonoBehaviour
     [Header("Audio Feedback")]
     [SerializeField] private AudioClip correctSound;
     [SerializeField] private AudioClip incorrectSound;
+    [SerializeField] private AudioClip trialEndClip;
     private AudioSource audioSource;
+    [Header(" Events")]
+    public UnityEvent trialEnd;
 
     private List<int> currentSequence = new List<int>();
     private int sequenceLength = 2;
@@ -64,6 +69,9 @@ public class DigitMemoryGame : MonoBehaviour
     void Start()
     {
         audioSource = gameObject.AddComponent<AudioSource>();
+        // Keyboard.SetActive(true);  // Activate Task UI
+        // submitButton.onClick.AddListener(CheckUserResponse);
+        submitButton.onClick.RemoveAllListeners();
         submitButton.onClick.AddListener(CheckUserResponse);
         
         resultsPanel.SetActive(false); // Hide results panel at the start
@@ -109,6 +117,25 @@ public class DigitMemoryGame : MonoBehaviour
         StartClick();
     }
 
+   public void mainTaskStart()
+    {
+        audioSource = gameObject.AddComponent<AudioSource>();
+        // Play the audio
+        PlaySound(trialEndClip);
+
+        // Start a coroutine to wait until the audio finishes
+        StartCoroutine(WaitForAudioToFinish());
+    }
+
+    private IEnumerator WaitForAudioToFinish()
+    {
+        // Wait until the audio has finished playing
+        yield return new WaitForSeconds(audioSource.clip.length);
+
+        // Call StartClick after the audio finishes
+        StartClick();
+    }
+
    // This function is called to start the task with a countdown
     public void StartClick()
     {
@@ -117,6 +144,8 @@ public class DigitMemoryGame : MonoBehaviour
         resultsPanel.SetActive(false);  // Deactivate Onboarding UI
         TaskUI.SetActive(true);  // Activate Task UI
         Keyboard.SetActive(true);  // Activate Task UI
+        submitButton.onClick.RemoveAllListeners();
+        submitButton.onClick.AddListener(CheckUserResponse);
         UpdateLevelUI();
         StartCoroutine(CountdownBeforeStart());
         
@@ -153,6 +182,8 @@ public class DigitMemoryGame : MonoBehaviour
 
         // Start the game after countdown
         StartNewLevel();
+        submitButton.onClick.RemoveAllListeners();
+    submitButton.onClick.AddListener(CheckUserResponse);
     }
 
     void StartNewLevel()
@@ -380,6 +411,7 @@ public class DigitMemoryGame : MonoBehaviour
 }
 
 
+        
         // Increment the total correct responses
         totalCorrectResponses++;
 
@@ -396,6 +428,11 @@ public class DigitMemoryGame : MonoBehaviour
             currentLevel++;
             sequenceInLevel = 0; // Reset for the next level
             if (currentLevel > 5) // End game after Level 5
+            {
+                EndGame();
+                return;
+            }
+            if (currentLevel > MAXLevel) // End game after Level 5
             {
                 EndGame();
                 return;
@@ -505,6 +542,7 @@ IEnumerator WaitAndStartNewLevel()
 {
     resultsPanel.SetActive(true);
     TaskUI.SetActive(false);
+    trialEnd?.Invoke();
     
     SetArabicText(longestSequenceText, 
         !isEnglish 

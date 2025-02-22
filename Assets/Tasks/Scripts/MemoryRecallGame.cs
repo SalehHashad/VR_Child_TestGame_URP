@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.Events;
 
 public class MemoryRecallGame : MonoBehaviour
 {
     // Game settings
     private int currentLevel = 1; // Start at Level 1
-    public int questionsPerLevel = 50; // Number of sequences per level
+    public int MaxLevel = 5; // Start at Level 1
+    public int questionsPerLevel = 5; // Number of sequences per level
     private float questionCounter = 1;
 
     public GameObject squarePrefab;
@@ -36,7 +38,11 @@ public  int maxErrors = 4; // The maximum allowed errors per level
     [Header("Audio Feedback")]
     [SerializeField] private AudioClip correctSound;
     [SerializeField] private AudioClip incorrectSound;
+    [SerializeField] private AudioClip trialEndClip;
     private AudioSource audioSource;
+
+[Header(" Events")]
+    public UnityEvent trialEnd;
 
     public GameObject taskUI;
 public GameObject onboardingUI;
@@ -117,13 +123,48 @@ void PlaySound(AudioClip clip)
     // Start the first level after task starts
     StartNextLevel();
 }
+public void mainTaskStart()
+{
+    if (audioSource == null)
+    {
+        audioSource = gameObject.AddComponent<AudioSource>();
+    }
+
+    if (trialEndClip == null)
+    {
+        Debug.LogError("trialEndClip is null! Assign it in the inspector.");
+        StartTask();
+        return;
+    }
+
+    // Play the audio
+    PlaySound(trialEndClip);
+
+    // Start a coroutine to wait until the audio finishes
+    StartCoroutine(WaitForAudioToFinish());
+}
+
+
+    private IEnumerator WaitForAudioToFinish()
+{
+    if (audioSource == null || audioSource.clip == null)
+    {
+        Debug.LogError("AudioSource or AudioClip is null. Skipping wait.");
+        StartTask(); // Ensure the next step continues even if no audio is present
+        yield break;
+    }
+
+    yield return new WaitForSeconds(audioSource.clip.length);
+
+    StartTask();
+}
     void Start()
     {
         AddArabicFixerToAllText();
         audioSource = gameObject.AddComponent<AudioSource>();
         // StartNextLevel();
         taskUI.SetActive(false);
-        onboardingUI.SetActive(true);
+        // onboardingUI.SetActive(true);
         SetArabicText(scoreText, isEnglish ? $"Score: {score}" : $"النتيجة: {score}");
         SetArabicText(recallTimeText, isEnglish ? $"Time {recallTime}" : $"الوقت {recallTime}");
 
@@ -139,6 +180,10 @@ SetArabicText(questionCounterText, isEnglish ? $"Question {questionCounter}/{que
     // Starts the next level or question
     void StartNextLevel()
     {
+        if(currentLevel>MaxLevel){
+            EndTask();
+            return;
+        }
        
         if (currentLevel > levels.Count)
         {
@@ -407,6 +452,7 @@ else
     // Disable further inputs or actions, effectively "ending" the task
     isRecalling = false;  // Stop recall process
     userSequence.Clear();  // Clear the user's sequence for the next task
+    trialEnd?.Invoke();
 
     
 }

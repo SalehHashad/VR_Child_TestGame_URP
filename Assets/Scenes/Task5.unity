@@ -20583,7 +20583,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9ca391f2d781b644d8d05495f92524b6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  task: {fileID: 1894151521}
+  task: {fileID: 1763688348}
   timeToStart: 25
   instructionCanvus: {fileID: 977614947}
   instructionAudio: {fileID: 1014824243}
@@ -20591,11 +20591,35 @@ MonoBehaviour:
   englishClip: {fileID: 8300000, guid: 3db8ce2706bffa74d8b21f36aa3139e2, type: 3}
   OnAudioFinished:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 2076270116}
+        m_TargetAssemblyTypeName: VisualAttentionTask, Assembly-CSharp
+        m_MethodName: StartTask
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   OnLanguageChanged:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1703385115}
+        m_TargetAssemblyTypeName: VisualAttentionTask, Assembly-CSharp
+        m_MethodName: SetLanguage
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 2076270116}
         m_TargetAssemblyTypeName: VisualAttentionTask, Assembly-CSharp
         m_MethodName: SetLanguage
         m_Mode: 1
@@ -33222,6 +33246,7 @@ MonoBehaviour:
   startingObjects: 4
   speed: 3
   level: 1
+  MaxLevel: 1
   totalwrongError: -10
   QuestionPerLevel: 20
   roundTime: 10
@@ -33230,6 +33255,11 @@ MonoBehaviour:
   questionText: {fileID: 1468823183}
   instructionsText: {fileID: 411643548}
   timerText: {fileID: 1685863584}
+  trialEnd:
+    m_PersistentCalls:
+      m_Calls: []
+  audioSource: {fileID: 780895896}
+  trialEndClip: {fileID: 8300000, guid: 78155604c52527942b5b429658f1c5d1, type: 3}
   maxconsecutiveWrong: 2
   isEnglish: 1
 --- !u!1001 &1714741047
@@ -35060,6 +35090,37 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1761475674}
   m_CullTransparentMesh: 1
+--- !u!1 &1763688348
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1763688349}
+  m_Layer: 0
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1763688349
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1763688348}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.014508486, y: 1.3473167, z: 1.674273}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1772884201
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -38713,7 +38774,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1894151522
 Transform:
   m_ObjectHideFlags: 0
@@ -38728,6 +38789,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1703385113}
+  - {fileID: 2076270115}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1915115674
@@ -45638,6 +45700,86 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2075729880}
   m_CullTransparentMesh: 1
+--- !u!1 &2076270114
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2076270115}
+  - component: {fileID: 2076270116}
+  m_Layer: 0
+  m_Name: BallTracking  trial
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2076270115
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2076270114}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1894151522}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2076270116
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2076270114}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 841f12b1dc14b4b48bd162f2ae495d04, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  resultUI: {fileID: 1703385112}
+  taskUI: {fileID: 25103267}
+  spherePrefab: {fileID: 6963342905083872210, guid: ab439853d7bc6d54d82cdb993e38d667, type: 3}
+  redBallPrefab: {fileID: 6963342905083872210, guid: 6cbea828228a2784cbb09e9d04556b6f, type: 3}
+  spawnPoint: {fileID: 166688266817864820}
+  startingObjects: 4
+  speed: 3
+  level: 1
+  MaxLevel: 1
+  totalwrongError: -100
+  QuestionPerLevel: 1
+  roundTime: 10
+  levelText: {fileID: 553715807}
+  scoreText: {fileID: 530012827}
+  questionText: {fileID: 1468823183}
+  instructionsText: {fileID: 411643548}
+  timerText: {fileID: 1685863584}
+  trialEnd:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1703385115}
+        m_TargetAssemblyTypeName: VisualAttentionTask, Assembly-CSharp
+        m_MethodName: mainTaskStart
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  audioSource: {fileID: 780895896}
+  trialEndClip: {fileID: 8300000, guid: 78155604c52527942b5b429658f1c5d1, type: 3}
+  maxconsecutiveWrong: 100
+  isEnglish: 1
 --- !u!1 &2077793072
 GameObject:
   m_ObjectHideFlags: 0
@@ -47835,3 +47977,4 @@ SceneRoots:
   - {fileID: 1014824245}
   - {fileID: 1735699022}
   - {fileID: 977614954}
+  - {fileID: 1763688349}

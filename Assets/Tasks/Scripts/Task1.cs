@@ -4,6 +4,7 @@ using UnityEngine;
 using TMPro;
 using System.Linq;
 using UnityEngine.UI;  
+using UnityEngine.Events;  
 
 public class Task1 : MonoBehaviour
 {
@@ -20,7 +21,8 @@ public class Task1 : MonoBehaviour
     public List<GameObject> arrowPrefabs; // Assign prefabs for each level in the Inspector
     private List<GameObject> spawnedArrows = new List<GameObject>();
     private List<TrialData> trialDataList = new List<TrialData>();
-
+[Header(" Events")]
+    public UnityEvent trialEnd;
     // Buttons
     public GameObject rightButton; // Button for the "Right" answer
     public GameObject leftButton; // Button for the "Left" answer
@@ -73,6 +75,7 @@ Vector3 targetPosition; // Default to center
 
 public AudioClip correctAnswerClip;
     public AudioClip wrongAnswerClip;
+    [SerializeField] private AudioClip trialEndClip;
 
 // Configurable error thresholds
 public int maxTotalErrors = 4;          // Maximum total incorrect answers per level
@@ -87,7 +90,41 @@ public GameObject resultUI;
 private Button rightButtonComponent; // Reference to the Button component
     private Button leftButtonComponent;  // Reference to the Button component
 public bool isEnglish = true; // Default to English
+public void mainTaskStart()
+{
+    if (audioSource == null)
+    {
+        audioSource = gameObject.AddComponent<AudioSource>();
+    }
 
+    if (trialEndClip == null)
+    {
+        Debug.LogError("trialEndClip is null! Assign it in the inspector.");
+        StartTask();
+        return;
+    }
+
+    // Play the audio
+    PlaySound(trialEndClip);
+
+    // Start a coroutine to wait until the audio finishes
+    StartCoroutine(WaitForAudioToFinish());
+}
+
+
+    private IEnumerator WaitForAudioToFinish()
+{
+    if (audioSource == null || audioSource.clip == null)
+    {
+        Debug.LogError("AudioSource or AudioClip is null. Skipping wait.");
+        StartTask(); // Ensure the next step continues even if no audio is present
+        yield break;
+    }
+
+    yield return new WaitForSeconds(audioSource.clip.length);
+
+    StartTask();
+}
     public void SetLanguage()
     {
         isEnglish = false;
@@ -144,7 +181,7 @@ public bool isEnglish = true; // Default to English
     }
 
 
-    void Start()
+    public void StartTask()
     {
         AddArabicFixerToAllText();
         rightButtonComponent = rightButton.GetComponent<Button>();
@@ -182,7 +219,7 @@ public bool isEnglish = true; // Default to English
 resultUI.SetActive(false);
 rightButton.SetActive(true);
     leftButton.SetActive(true);
-    ShowFeedback(" ");
+    ShowFeedback(isEnglish ? $" " : $" ");
         // Call StartClick to begin the task
         StartCoroutine(GameFlow(level));
     }
@@ -193,6 +230,9 @@ rightButton.SetActive(true);
     for (int level=lvl; level <= arrowPrefabs.Count; level++) // Loop through levels
     {
         if (isTaskEnded) yield break; // Stop if task has ended
+        if(level>1){
+           EndTask(); 
+        }
 
         currentLevel = level;
         totalErrors = 0;
@@ -201,7 +241,9 @@ rightButton.SetActive(true);
 
         for (int i = 0; i < totalQuestions; i++) // Loop through questions in a level
         {
-            ShowFeedback("Determine the direction for objects spawned at the center");
+            
+            ShowFeedback(isEnglish ? $"Determine the direction for objects spawned at the center" : $"حدد اتجاه الكائنات الظاهرة في المركز");
+            // ShowFeedback("Determine the direction for objects spawned at the center");
             if (isTaskEnded) yield break; // Stop if task has ended
 
             currentQuestion++;
@@ -217,7 +259,8 @@ rightButton.SetActive(true);
         }
 
         // Display level summary
-        ShowFeedback($"Level {level} Complete! Accuracy: {correctResponses * 100 / totalQuestions}%");
+        ShowFeedback(isEnglish ? $"Level {level} Complete! Accuracy: {correctResponses * 100 / totalQuestions}%" : $"المستوى {level} كامل! الدقة: {correctResponses * 100 / totalQuestions}%");
+        // ShowFeedback($"Level {level} Complete! Accuracy: {correctResponses * 100 / totalQuestions}%");
         correctResponses = 0;
         yield return new WaitForSeconds(3.0f);
         ClearFeedback();
@@ -548,15 +591,22 @@ void CreateSurroundingArrows(string state, string location)
 
     void UpdateUI()
     {
-        levelText.text = $"Level: {currentLevel}";
-        questionCounterText.text = $"Question: {currentQuestion}/{totalQuestions}";
+        SetArabicText(levelText, isEnglish ? 
+    $"Level: {currentLevel}" : 
+    $"المستوى: {currentLevel}");
+
+SetArabicText(questionCounterText, isEnglish ? 
+    $"Question: {currentQuestion}/{totalQuestions}" : 
+    $"السؤال: {currentQuestion}/{totalQuestions}");
+
         
     }
 
     void ShowFeedback(string message)
     {
-        
-        feedbackText.text = message;
+         SetArabicText(feedbackText, message);
+
+        // feedbackText.text = message;
         feedbackText.gameObject.SetActive(true);
     }
 
@@ -585,7 +635,8 @@ void AnswerSelected(string direction)
     participantResponse = direction;
 
     // Provide feedback
-    ShowFeedback(correctResponse ? "Correct!" : "Wrong!");
+    
+    ShowFeedback(correctResponse ? (isEnglish ? $"Correct" : $"صحيح") : (isEnglish ? $"Wrong" : $"خطأ"));
     StartCoroutine(HideFeedbackAfterDelay(1.0f));
 
     // Play sound based on correctness of the response
@@ -619,12 +670,16 @@ void AnswerSelected(string direction)
 void EndTask()
 {
     Debug.Log("Task ended due to too many errors.");
-    ShowFeedback("Task ended due to too many errors.");
+     
+    ShowFeedback(isEnglish ? $"Task ended due to too many errors." : $"انتهت المهمة بسبب وجود الكثير من الأخطاء.");
+    // ShowFeedback("Task ended due to too many errors.");
     isTaskEnded = true; // Signal to stop GameFlow
     resultUI.SetActive(true);
 rightButton.SetActive(false);
     leftButton.SetActive(false);
     StopAllCoroutines(); // Optionally stop all coroutines if necessary
+
+    trialEnd?.Invoke();
     // Additional logic for ending the task (e.g., showing summary screen)
 
     // Calculate Mean Reaction Times for various conditions
@@ -642,9 +697,18 @@ rightButton.SetActive(false);
     float executiveControl = meanReactionTimeIncongruent - meanReactionTimeCongruent;
     float alerting = meanReactionTimeNoCue - meanReactionTimeDoubleCue;
     // Update the TextMesh Pro UI elements with the results
-        orientingText.text = $"Orienting: {orienting} ms";
-        executiveControlText.text = $"Executive Control: {executiveControl} ms";
-        alertingText.text = $"Alerting: {alerting} ms";
+        SetArabicText(orientingText, isEnglish ? 
+    $"Orienting: {orienting} ms" : 
+    $"التوجيه: {orienting} مللي ثانية");
+
+SetArabicText(executiveControlText, isEnglish ? 
+    $"Executive Control: {executiveControl} ms" : 
+    $"التحكم التنفيذي: {executiveControl} مللي ثانية");
+
+SetArabicText(alertingText, isEnglish ? 
+    $"Alerting: {alerting} ms" : 
+    $"الإنذار: {alerting} مللي ثانية");
+
 
 
 
@@ -714,7 +778,11 @@ private float CalculateMeanReactionTimecueType(string cueType)
         }
     }
 
-
+void PlaySound(AudioClip clip)
+    {
+        audioSource.clip = clip;
+        audioSource.Play();
+    }
 
     void DestroyPreviousArrows()
     {

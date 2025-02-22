@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI; 
 using TMPro; 
 using System.Collections; 
+using UnityEngine.Events;
 public class ObjectController : MonoBehaviour
 {
     public GameObject objectPrefab; // Prefab to spawn
@@ -21,6 +22,7 @@ public class ObjectController : MonoBehaviour
     private int score = 0;
     private int Question = 1;
     public int QuestionPerLevel = 50;
+    public int MaxQuestionTrailLevel = 1;
     public float appearSeconds = 50;
     public float timeBetwenQ = 1f;
 
@@ -38,15 +40,54 @@ public class ObjectController : MonoBehaviour
     public Button horizontalButton;
 
     private float targetRotation = 0f; // Track the rotation of the target object (0 or 90)
-
+[Header(" Events")]
+    public UnityEvent trialEnd;
     
 [Header("Audio Feedback")]
     [SerializeField] private AudioClip correctSound;
     [SerializeField] private AudioClip incorrectSound;
+    [SerializeField] private AudioClip trialEndClip;
     private AudioSource audioSource;
 
+ 
 public bool isEnglish = true; // Default to English
+public bool taskActive = true; // Default to English
 
+public void mainTaskStart()
+{
+    if (audioSource == null)
+    {
+        audioSource = gameObject.AddComponent<AudioSource>();
+    }
+
+    if (trialEndClip == null)
+    {
+        Debug.LogError("trialEndClip is null! Assign it in the inspector.");
+        StartTask();
+        return;
+    }
+
+    // Play the audio
+    PlaySound(trialEndClip);
+
+    // Start a coroutine to wait until the audio finishes
+    StartCoroutine(WaitForAudioToFinish());
+}
+
+
+    private IEnumerator WaitForAudioToFinish()
+{
+    if (audioSource == null || audioSource.clip == null)
+    {
+        Debug.LogError("AudioSource or AudioClip is null. Skipping wait.");
+        StartTask(); // Ensure the next step continues even if no audio is present
+        yield break;
+    }
+
+    yield return new WaitForSeconds(audioSource.clip.length);
+
+    StartTask();
+}
     public void SetLanguage()
     {
         isEnglish = false;
@@ -120,7 +161,8 @@ SetArabicText(instructionText, isEnglish ? "Task Started!" : "تم بدء الم
     void StartNewLevel()
     {
         
-        
+        if (!taskActive)
+        return;
 
         // Spawn objects and start the game
         SpawnObjects();
@@ -128,7 +170,7 @@ SetArabicText(instructionText, isEnglish ? "Task Started!" : "تم بدء الم
         
     }
 
-    void Start(){
+    public void StartTask(){
         audioSource = gameObject.AddComponent<AudioSource>();
         // Add listeners to the vertical and horizontal buttons
         verticalButton.onClick.AddListener(VerticalButtonClicked);
@@ -147,9 +189,8 @@ SetArabicText(QuestionText, isEnglish ? $"Question: {Question}/{QuestionPerLevel
         StartCoroutine(CountdownBeforeStart());
     }
 
-    void SpawnObjects()
-    {
-        // Destroy old buttons from previous round
+void DestroyButtonsAndObj(){
+    // Destroy old buttons from previous round
         foreach (GameObject button in buttons)
         {
             if (button != null) Destroy(button);
@@ -159,6 +200,13 @@ SetArabicText(QuestionText, isEnglish ? $"Question: {Question}/{QuestionPerLevel
         {
             if (obj != null) Destroy(obj);
         }
+}
+    void SpawnObjects()
+    {
+        if (!taskActive)
+        return;
+        // Destroy old buttons from previous round
+        DestroyButtonsAndObj();
 
         // Spawn objects in the parent object with GridLayoutGroup
         for (int i = 0; i < spawnedObjects.Length; i++)
@@ -232,6 +280,8 @@ SetArabicText(QuestionText, isEnglish ? $"Question: {Question}/{QuestionPerLevel
 
     void OnButtonClick(int buttonIndex)
     {
+        if (!taskActive)
+        return;
         if (spawnedObjects[buttonIndex] == targetObject)
         {
             // Correct button clicked, increase score
@@ -283,6 +333,9 @@ SetArabicText(QuestionText, isEnglish ? $"Question: {Question}/{QuestionPerLevel
     {
         // Game over or complete
        SetArabicText(instructionText, isEnglish ? "You've completed all questions!" : "لقد أكملت جميع الأسئلة!");
+       DestroyButtonsAndObj();
+       taskActive=false;
+      trialEnd?.Invoke();
 
     }
 }
@@ -313,6 +366,8 @@ void ResetForNextRound()
 
     void VerticalButtonClicked()
     {
+        if (!taskActive)
+        return;
        if (targetRotation == 0f)
 {
     IncreaseScore(); // Add point if the rotation is 0
@@ -331,6 +386,8 @@ else
 
     void HorizontalButtonClicked()
     {
+        if (!taskActive)
+        return;
         if (targetRotation == 90f)
 {
     IncreaseScore(); // Add point if the rotation is 90

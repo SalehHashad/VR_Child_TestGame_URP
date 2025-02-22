@@ -466,7 +466,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3308858817409672585, guid: d81438f692aa08e4bb6ab28935f56255, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3308858817409672585, guid: d81438f692aa08e4bb6ab28935f56255, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
@@ -9316,10 +9316,34 @@ MonoBehaviour:
   englishClip: {fileID: 8300000, guid: e441e13a75672f94da9b367729500f70, type: 3}
   OnAudioFinished:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 891661757}
+        m_TargetAssemblyTypeName: CountingBall, Assembly-CSharp
+        m_MethodName: StartTheTask
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   OnLanguageChanged:
     m_PersistentCalls:
       m_Calls:
+      - m_Target: {fileID: 891661757}
+        m_TargetAssemblyTypeName: CountingBall, Assembly-CSharp
+        m_MethodName: SetLanguage
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
       - m_Target: {fileID: 1703385114}
         m_TargetAssemblyTypeName: CountingBall, Assembly-CSharp
         m_MethodName: SetLanguage
@@ -13523,6 +13547,10 @@ PrefabInstance:
       value: ART
       objectReference: {fileID: 0}
     - target: {fileID: 1372239393459633397, guid: 7bcc07d7d2782a044907d0722a41ad3e, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1372239393459633397, guid: 7bcc07d7d2782a044907d0722a41ad3e, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 0
       objectReference: {fileID: 0}
@@ -15785,6 +15813,90 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9873383e46ca3fa45a757532cee3720f, type: 3}
+--- !u!1 &891661755
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 891661756}
+  - component: {fileID: 891661757}
+  m_Layer: 0
+  m_Name: CountingBall trial
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &891661756
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 891661755}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1894151522}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &891661757
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 891661755}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 532d4b4cd44115049bf6e95597a16101, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ballPrefab: {fileID: 6963342905083872210, guid: 345f59995b62bb14fa70f3729941eb79, type: 3}
+  instructionText: {fileID: 411643548}
+  answerInputField: {fileID: 1527010996}
+  submitButton: {fileID: 1229340419}
+  scoreText: {fileID: 553715807}
+  timeDuration: {fileID: 530012827}
+  levelText: {fileID: 1468823183}
+  questionText: {fileID: 1685863584}
+  audioSource: {fileID: 780895896}
+  correctSound: {fileID: 8300000, guid: 17159cf7a9558de469b30ffc0047da70, type: 3}
+  wrongSound: {fileID: 8300000, guid: 6a5b229a20dcba14b905cec58ecbc96b, type: 3}
+  trialEndClip: {fileID: 8300000, guid: 78155604c52527942b5b429658f1c5d1, type: 3}
+  minX: -7
+  maxX: 7
+  minY: -4
+  maxY: 4
+  minZ: 5
+  maxZ: 20
+  forwardOffset: 5
+  maxLevel: 1
+  maxTotalErrors: 4
+  questionPerLevel: 1
+  keyboard: {fileID: 762645387}
+  spawnPoint: {fileID: 687271623}
+  isEnglish: 1
+  trialEnd:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1703385114}
+        m_TargetAssemblyTypeName: CountingBall, Assembly-CSharp
+        m_MethodName: mainTaskStart
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1001 &906982586
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -19584,7 +19696,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6598815579406187037, guid: 18ddb545287c546e19cc77dc9fbb2189, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -29851,6 +29963,7 @@ MonoBehaviour:
   audioSource: {fileID: 780895896}
   correctSound: {fileID: 8300000, guid: 17159cf7a9558de469b30ffc0047da70, type: 3}
   wrongSound: {fileID: 8300000, guid: 6a5b229a20dcba14b905cec58ecbc96b, type: 3}
+  trialEndClip: {fileID: 8300000, guid: 78155604c52527942b5b429658f1c5d1, type: 3}
   minX: -7
   maxX: 7
   minY: -4
@@ -29858,11 +29971,15 @@ MonoBehaviour:
   minZ: 5
   maxZ: 20
   forwardOffset: 5
+  maxLevel: 5
   maxTotalErrors: 4
   questionPerLevel: 20
   keyboard: {fileID: 762645387}
   spawnPoint: {fileID: 687271623}
   isEnglish: 1
+  trialEnd:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1001 &1714741047
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -34982,7 +35099,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1894151522
 Transform:
   m_ObjectHideFlags: 0
@@ -34997,6 +35114,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1703385113}
+  - {fileID: 891661756}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1917805469
