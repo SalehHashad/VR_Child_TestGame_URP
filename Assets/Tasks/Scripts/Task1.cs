@@ -4,7 +4,8 @@ using UnityEngine;
 using TMPro;
 using System.Linq;
 using UnityEngine.UI;  
-using UnityEngine.Events;  
+using UnityEngine.Events;
+using UnityEngine.SceneManagement;
 
 public class Task1 : MonoBehaviour
 {
@@ -56,6 +57,7 @@ public float arrowOffset = 1.0f; // Adjust this in the Inspector for spacing
 
     public float cueOffset = 2.0f; // Distance between cues for Spatial/Double Cue
     public float targetOffset = 2.0f; // Distance between cues for Spatial/Double Cue
+    
     private string[] cueTypes = { "Spatial Cue", "Double Cue", "No Cue", "Center Cue" };
     private string currentCueType; // The current cue type
     private List<GameObject> activeCues = new List<GameObject>(); // Track active cues
@@ -230,7 +232,7 @@ rightButton.SetActive(true);
     for (int level=lvl; level <= arrowPrefabs.Count; level++) // Loop through levels
     {
         if (isTaskEnded) yield break; // Stop if task has ended
-        if(level>1){
+        if(level>5){
            EndTask(); 
         }
 
@@ -275,84 +277,84 @@ rightButton.SetActive(true);
 }
 
 
- IEnumerator RunTrial()
-{
-     rightButtonComponent.interactable = false; 
-        leftButtonComponent.interactable = false;  
-
-    // Create an object to store trial data
-    TrialData currentTrialData = new TrialData();
-
-    trialNumber++;
-    currentTrialData.trialNumber = trialNumber;
-    // fixationTime=Random.Range(fixationTimeMin, fixationTimeMax);
-    fixationTime=CalculateFixationTimeAndIti(currentLevel,currentQuestion,true);
-    
-    // Record the fixation time (converted to seconds for usage in yield)
-    currentTrialData.fixationTime = fixationTime * 1000f; // in milliseconds
-
-    // Display fixation point
-    if (fixationPoint != null)
+    IEnumerator RunTrial()
     {
-        fixationPoint.SetActive(true);
+        rightButtonComponent.interactable = false;
+        leftButtonComponent.interactable = false;
+
+        // Create an object to store trial data
+        TrialData currentTrialData = new TrialData();
+
+        trialNumber++;
+        currentTrialData.trialNumber = trialNumber;
+        // fixationTime=Random.Range(fixationTimeMin, fixationTimeMax);
+        fixationTime = CalculateFixationTimeAndIti(currentLevel, currentQuestion, true);
+
+        // Record the fixation time (converted to seconds for usage in yield)
+        currentTrialData.fixationTime = fixationTime * 1000f; // in milliseconds
+
+        // Display fixation point
+        if (fixationPoint != null)
+        {
+            fixationPoint.SetActive(true);
+        }
+        yield return new WaitForSeconds(fixationTime);
+
+        // Hide fixation point and display cue
+        if (fixationPoint != null)
+        {
+            fixationPoint.SetActive(false);
+        }
+
+        // Display the cue
+        DisplayCue();
+
+        yield return new WaitForSeconds(cueTime);
+        currentTrialData.cueType = currentCueType;
+        // Record Inter-Trial Interval (ITI)
+        currentTrialData.iti = interTrialInterval * 1000f; // in milliseconds
+        ClearCues(); // Clear any active cues
+
+        // Hide cue and display target
+        SpawnTarget(); // Spawn the target arrow at the spawn point
+        yield return new WaitForSeconds(fixationTime);
+        DestroyPreviousArrows();
+        rightButtonComponent.interactable = true;
+        leftButtonComponent.interactable = true;
+
+        // Record the direction of the target
+        currentTrialData.direction = currentCorrectDirection;
+        currentTrialData.targetLocation = currentLocation;
+        // Record response
+        isResponding = true;
+        responseStartTime = Time.time;
+
+        while (isResponding)
+        {
+            yield return null;
+        }
+
+        currentTrialData.congruencyState = congruencyState;
+        // Calculate response time
+        currentTrialData.responseTime = (Time.time - responseStartTime) * 1000f; // in milliseconds
+
+        // Store the participant's response (this should be updated based on actual user input)
+        currentTrialData.response = participantResponse;  // Assume participantResponse is tracked elsewhere
+
+        // Determine accuracy based on response
+        currentTrialData.accuracy = (currentTrialData.response == currentTrialData.direction) ? 1 : 0;
+        correctResponses += currentTrialData.accuracy;
+        Debug.Log("correctResponses:" + correctResponses);
+        // Log the trial data for later analysis (you can print, store in a file, or add to a list)
+        LogTrialData(currentTrialData);
+
+        // Hide target
+        if (currentTarget != null)
+        {
+            Destroy(currentTarget);
+        }
     }
-    yield return new WaitForSeconds(fixationTime);
-
-    // Hide fixation point and display cue
-    if (fixationPoint != null)
-    {
-        fixationPoint.SetActive(false);
-    }
-
-    // Display the cue
-    DisplayCue();
-
-    yield return new WaitForSeconds(cueTime);
-    currentTrialData.cueType = currentCueType;
-    // Record Inter-Trial Interval (ITI)
-    currentTrialData.iti = interTrialInterval * 1000f; // in milliseconds
-    ClearCues(); // Clear any active cues
-
-    // Hide cue and display target
-    SpawnTarget(); // Spawn the target arrow at the spawn point
-    yield return new WaitForSeconds(fixationTime);
-    DestroyPreviousArrows();
-     rightButtonComponent.interactable = true; 
-        leftButtonComponent.interactable = true;  
-
-    // Record the direction of the target
-    currentTrialData.direction = currentCorrectDirection;
- currentTrialData.targetLocation=currentLocation;
-    // Record response
-    isResponding = true;
-    responseStartTime = Time.time;
-
-    while (isResponding)
-    {
-        yield return null;
-    }
-    
-    currentTrialData.congruencyState=congruencyState;
-    // Calculate response time
-    currentTrialData.responseTime = (Time.time - responseStartTime) * 1000f; // in milliseconds
-
-    // Store the participant's response (this should be updated based on actual user input)
-    currentTrialData.response = participantResponse;  // Assume participantResponse is tracked elsewhere
-
-    // Determine accuracy based on response
-    currentTrialData.accuracy = (currentTrialData.response == currentTrialData.direction) ? 1 : 0;
-    correctResponses+=currentTrialData.accuracy;
-    Debug.Log("correctResponses:"+correctResponses);
-    // Log the trial data for later analysis (you can print, store in a file, or add to a list)
-    LogTrialData(currentTrialData);
-
-    // Hide target
-    if (currentTarget != null)
-    {
-        Destroy(currentTarget);
-    }
-}
-void LogTrialData(TrialData trialData)
+    void LogTrialData(TrialData trialData)
 {
     // Log the trial data to the console for debugging or analysis
     Debug.Log("Trial Data:");
@@ -805,7 +807,11 @@ void PlaySound(AudioClip clip)
         ClearFeedback();
     }
 
+    public void LoadMainMenu()
+    {
+        SceneManager.LoadScene(0);
 
+    }
 
 
 
